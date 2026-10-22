@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { redirect, unstable_rethrow } from "next/navigation";
 import {
   executeGraphQL,
   runGatedMutation,
@@ -13,20 +13,20 @@ import { normalizeVideoUrl } from "@/lib/video";
 import { MAX_PHOTOS_PER_UPLOAD } from "@/lib/upload-limits";
 import {
   CREATE_GALLERY_ITEM_MUTATION,
+  GALLERY_ITEM_QUERY,
   UPDATE_GALLERY_ITEM_MUTATION,
   DELETE_GALLERY_ITEM_MUTATION,
   DELETE_GALLERY_ITEMS_MUTATION,
 } from "@/lib/queries/gallery";
 
-function readCaption(formData: FormData) {
-  const captionRaw = formData.get("caption");
-  return typeof captionRaw === "string" && captionRaw ? captionRaw : null;
+function readEventId(formData: FormData) {
+  const eventIdRaw = formData.get("eventId");
+  return typeof eventIdRaw === "string" && eventIdRaw ? eventIdRaw : null;
 }
 
 async function createOneGalleryItem(input: {
   type: "PHOTO" | "VIDEO";
   url: string;
-  caption: string | null;
   eventId: string | null;
 }) {
   try {
@@ -44,9 +44,7 @@ async function createOneGalleryItem(input: {
 
 export async function createGalleryItemAction(formData: FormData) {
   const type = formData.get("type") === "VIDEO" ? "VIDEO" : "PHOTO";
-  const eventIdRaw = formData.get("eventId");
-  const eventId = typeof eventIdRaw === "string" && eventIdRaw ? eventIdRaw : null;
-  const caption = readCaption(formData);
+  const eventId = readEventId(formData);
 
   if (type === "PHOTO") {
     const files = formData
@@ -72,7 +70,7 @@ export async function createGalleryItemAction(formData: FormData) {
       // files in parallel and having to reconcile a partial-failure state.
       for (const file of files) {
         const url = await uploadPhoto(file);
-        await createOneGalleryItem({ type, url, caption, eventId });
+        await createOneGalleryItem({ type, url, eventId });
       }
     } catch (error) {
       if (error instanceof GraphQLRequestError) {
@@ -90,7 +88,7 @@ export async function createGalleryItemAction(formData: FormData) {
 
     try {
       const url = normalizeVideoUrl(videoUrl);
-      await createOneGalleryItem({ type, url, caption, eventId });
+      await createOneGalleryItem({ type, url, eventId });
     } catch (error) {
       if (error instanceof GraphQLRequestError) {
         redirect(withFlash("/manage/gallery/new", { error: error.message }));
@@ -108,17 +106,51 @@ export async function createGalleryItemAction(formData: FormData) {
 }
 
 export async function updateGalleryItemAction(id: string, formData: FormData) {
-  const caption = readCaption(formData);
+  const editPath = `/manage/gallery/${id}/edit`;
+  const { galleryItem: item } = await executeGraphQL<{
+    galleryItem: { type: "PHOTO" | "VIDEO"; event: { id: string } | null } | null;
+  }>(GALLERY_ITEM_QUERY, { id });
+  if (!item) redirect("/manage/gallery");
 
-  await runGatedMutation(() =>
-    executeGraphQL(UPDATE_GALLERY_ITEM_MUTATION, { id, input: { caption } }),
-  );
+  const eventId = readEventId(formData);
+  const input: { eventId: string | null; url?: string } = { eventId };
+
+  // The item's type comes from the DB, not the form: photos may get a new
+  // file, videos a new link. Leaving either empty keeps the current one.
+  let newPhotoUrl: string | undefined;
+  try {
+    if (item.type === "PHOTO") {
+      const file = formData.get("photo");
+      if (file instanceof File && file.size > 0) {
+        newPhotoUrl = await uploadPhoto(file);
+        input.url = newPhotoUrl;
+      }
+    } else {
+      const videoUrl = formData.get("videoUrl");
+      if (typeof videoUrl === "string" && videoUrl.trim()) {
+        input.url = normalizeVideoUrl(videoUrl.trim());
+      }
+    }
+    // The resolver deletes the replaced photo's old file on success.
+    await runGatedMutation(() => executeGraphQL(UPDATE_GALLERY_ITEM_MUTATION, { id, input }));
+  } catch (error) {
+    // Let Next.js's own redirect (e.g. to /login on an expired session) through.
+    unstable_rethrow(error);
+    if (newPhotoUrl) await deletePhoto(newPhotoUrl).catch(() => {});
+    // GraphQL errors and uploadPhoto/normalizeVideoUrl's plain Errors all
+    // carry a Portuguese message meant for the form.
+    if (error instanceof Error) {
+      redirect(withFlash(editPath, { error: error.message }));
+    }
+    throw error;
+  }
 
   revalidatePath("/gallery");
   revalidatePath("/manage/gallery");
-  redirect(
-    withFlash("/manage/gallery", { success: "Legenda atualizada com sucesso." }),
-  );
+  revalidatePath("/");
+  if (item.event) revalidatePath(`/events/${item.event.id}`);
+  if (eventId) revalidatePath(`/events/${eventId}`);
+  redirect(withFlash("/manage/gallery", { success: "Item atualizado com sucesso." }));
 }
 
 export async function deleteGalleryItemAction(id: string) {

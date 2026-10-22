@@ -32,7 +32,6 @@ type EventData = {
       type: "PHOTO" | "VIDEO";
       url: string;
       thumbnailUrl: string | null;
-      caption: string | null;
     }[];
   } | null;
 };
@@ -114,7 +113,6 @@ export default async function EventDetailPage({
             type: item.type,
             url: item.url,
             thumbnailUrl: item.thumbnailUrl,
-            caption: item.caption,
           }))}
         />
       )}

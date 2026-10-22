@@ -979,6 +979,39 @@ Derived from [PLAN.md](./PLAN.md). Check items off as they're completed.
   short page most photos still load right away - the batches are what cap
   it. The bigger remaining win is thumbnails (see backlog).
 
+## Gallery: remove captions, "Editar" changes the photo/video and event
+
+- [x] Captions removed everywhere (upload form, old "Editar legenda" page,
+      text under cards, lightbox, GraphQL types/inputs/queries, Prisma
+      schema). None of the 21 items had one, so no content was lost.
+- [ ] Apply migration `20261022190000_remove_gallery_item_caption` (drops
+      `GalleryItem.caption`) **only after** this code is deployed on
+      Vercel: the previous deployment's Prisma client still selects the
+      column, so dropping it first would break the live gallery. Command:
+      `npx prisma migrate deploy --config prisma7.config.ts`.
+- [x] "Editar legenda" -> "Editar" on `/manage/gallery`. The edit page
+      shows the current photo/video and lets you:
+      - photo: optionally pick a new file (compressed in the browser like
+        uploads) - the resolver deletes the replaced file from Storage;
+      - video: optionally paste a new YouTube/Facebook link (normalized
+        like on upload);
+      - change the event or choose "Nenhum".
+      `updateGalleryItem` now takes `url`/`eventId` (omitted = unchanged,
+      `eventId: null` = no event). The action reads the item's type from
+      the DB rather than the form, and uses `unstable_rethrow` so the
+      `/login` redirect on an expired session isn't swallowed by its
+      `catch`.
+- [x] Event selects (upload and edit) show "Nenhum" instead of an empty
+      box (`displayEmpty` + shrunk label).
+- Verified end-to-end in headless Chromium on a temporary photo uploaded
+  through the real form: replace + set event -> new `.webp`, old file
+  gone from Storage (Supabase answers 400 for missing objects), event
+  saved; then event "Nenhum" without a file -> photo kept, event cleared;
+  video edit page renders with the link field; temp item deleted
+  afterwards (gallery back to 21 items).
+- Gotcha: `pkill -f "next dev"` also matches (and kills) the shell running
+  it - stop the dev server by PID instead.
+
 ## Backlog: improvement ideas (free-tier aware)
 
 From a functionality review. Ordered roughly by value; constraints of the

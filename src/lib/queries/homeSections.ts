@@ -10,7 +10,6 @@ export const HOME_SECTIONS_QUERY = /* GraphQL */ `
         type
         url
         thumbnailUrl
-        caption
       }
     }
   }
@@ -27,7 +26,6 @@ export const HOME_SECTION_QUERY = /* GraphQL */ `
         type
         url
         thumbnailUrl
-        caption
       }
     }
   }
@@ -40,7 +38,6 @@ export const GALLERY_ITEMS_FOR_PICKER_QUERY = /* GraphQL */ `
       type
       url
       thumbnailUrl
-      caption
     }
   }
 `;

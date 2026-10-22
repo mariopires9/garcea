@@ -30,7 +30,6 @@ type GalleryData = {
     type: "PHOTO" | "VIDEO";
     url: string;
     thumbnailUrl: string | null;
-    caption: string | null;
     event: { id: string; title: string } | null;
   }[];
 };
@@ -119,7 +118,7 @@ export default async function ManageGalleryPage({
           <GalleryLightboxProvider
             photos={data.galleryItems
               .filter((item) => item.type === "PHOTO")
-              .map((item) => ({ id: item.id, url: item.url, caption: item.caption }))}
+              .map((item) => ({ id: item.id, url: item.url }))}
           >
             <Box
               sx={{
@@ -137,7 +136,6 @@ export default async function ManageGalleryPage({
                         type: item.type,
                         url: item.url,
                         thumbnailUrl: item.thumbnailUrl,
-                        caption: item.caption,
                       }}
                     />
                   </SelectableGalleryItem>
@@ -146,7 +144,7 @@ export default async function ManageGalleryPage({
                   </Typography>
                   <Stack direction="row" spacing={2}>
                     <Button href={`/manage/gallery/${item.id}/edit`} size="small">
-                      Editar legenda
+                      Editar
                     </Button>
                     <Button
                       href={`/manage/gallery/${item.id}/delete`}

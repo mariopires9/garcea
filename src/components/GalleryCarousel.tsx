@@ -14,7 +14,6 @@ type GalleryItem = {
   type: "PHOTO" | "VIDEO";
   url: string;
   thumbnailUrl?: string | null;
-  caption?: string | null;
 };
 
 export function GalleryCarousel({ items }: { items: GalleryItem[] }) {

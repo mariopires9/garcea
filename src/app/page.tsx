@@ -19,7 +19,6 @@ type HomeSectionsData = {
       type: "PHOTO" | "VIDEO";
       url: string;
       thumbnailUrl: string | null;
-      caption: string | null;
     }[];
   }[];
 };
@@ -54,7 +53,6 @@ export default async function Home() {
                     type: photo.type,
                     url: photo.url,
                     thumbnailUrl: photo.thumbnailUrl,
-                    caption: photo.caption,
                   }))}
                 />
               )}

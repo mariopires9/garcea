@@ -6,7 +6,6 @@ export const GALLERY_ITEMS_QUERY = /* GraphQL */ `
       type
       url
       thumbnailUrl
-      caption
       event {
         id
         title
@@ -22,7 +21,6 @@ export const GALLERY_ITEM_QUERY = /* GraphQL */ `
       type
       url
       thumbnailUrl
-      caption
       event {
         id
         title

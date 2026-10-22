@@ -57,7 +57,6 @@ export const typeDefs = /* GraphQL */ `
     type: GalleryItemType!
     url: String!
     thumbnailUrl: String
-    caption: String
     createdAt: String!
     event: Event
     uploadedBy: User!
@@ -107,13 +106,14 @@ export const typeDefs = /* GraphQL */ `
     type: GalleryItemType!
     url: String!
     thumbnailUrl: String
-    caption: String
     eventId: ID
   }
 
+  "Omitted fields are left unchanged; eventId: null removes the event."
   input GalleryItemUpdateInput {
-    caption: String
+    url: String
     thumbnailUrl: String
+    eventId: ID
   }
 
   input HomeSectionInput {

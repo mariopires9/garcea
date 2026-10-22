@@ -10,7 +10,6 @@ type GalleryItem = {
   type: "PHOTO" | "VIDEO";
   url: string;
   thumbnailUrl?: string | null;
-  caption?: string | null;
 };
 
 /** Public gallery grid; clicking a photo opens it full-screen. */

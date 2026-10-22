@@ -9,7 +9,6 @@ type GalleryItem = {
   type: "PHOTO" | "VIDEO";
   url: string;
   thumbnailUrl?: string | null;
-  caption?: string | null;
 };
 
 const OpenPhotoContext = createContext<((id: string) => void) | null>(null);

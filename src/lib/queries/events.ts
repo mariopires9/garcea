@@ -40,7 +40,6 @@ export const EVENT_QUERY = /* GraphQL */ `
         type
         url
         thumbnailUrl
-        caption
       }
     }
   }

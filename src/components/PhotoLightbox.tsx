@@ -13,7 +13,6 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 export type LightboxPhoto = {
   id: string;
   url: string;
-  caption?: string | null;
 };
 
 const overlayButtonSx = {
@@ -91,8 +90,6 @@ function LightboxContent({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [emblaApi]);
 
-  const caption = photos[selectedIndex]?.caption;
-
   return (
     <Box sx={{ position: "relative", height: "100%", display: "flex", flexDirection: "column" }}>
       <Box ref={emblaRef} sx={{ overflow: "hidden", flex: 1, minHeight: 0 }}>
@@ -112,7 +109,7 @@ function LightboxContent({
               <Box
                 component="img"
                 src={photo.url}
-                alt={photo.caption ?? ""}
+                alt=""
                 // Every slide is rendered, so only fetch the ones being viewed.
                 loading="lazy"
                 sx={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", userSelect: "none" }}
@@ -123,8 +120,7 @@ function LightboxContent({
         </Box>
       </Box>
 
-      <Box sx={{ textAlign: "center", color: "common.white", px: 2, pb: 2, minHeight: "3rem" }}>
-        {caption && <Typography>{caption}</Typography>}
+      <Box sx={{ textAlign: "center", color: "common.white", px: 2, pb: 2, minHeight: "2rem" }}>
         {photos.length > 1 && (
           <Typography variant="caption" sx={{ opacity: 0.7 }}>
             {selectedIndex + 1} / {photos.length}

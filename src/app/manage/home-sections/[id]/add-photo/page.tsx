@@ -20,7 +20,6 @@ type GalleryItemsData = {
     type: "PHOTO" | "VIDEO";
     url: string;
     thumbnailUrl: string | null;
-    caption: string | null;
   }[];
 };
 

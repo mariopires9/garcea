@@ -16,13 +16,13 @@ type GalleryItemInput = {
   type: "PHOTO" | "VIDEO";
   url: string;
   thumbnailUrl?: string | null;
-  caption?: string | null;
   eventId?: string | null;
 };
 
 type GalleryItemUpdateInput = {
-  caption?: string | null;
+  url?: string | null;
   thumbnailUrl?: string | null;
+  eventId?: string | null;
 };
 
 type OfficialContactInput = {
@@ -159,16 +159,31 @@ export const resolvers = {
         data: { ...args.input, uploadedById: userId },
       });
     },
-    updateGalleryItem: (
+    updateGalleryItem: async (
       _: unknown,
       args: { id: string; input: GalleryItemUpdateInput },
       context: GraphQLContext,
     ) => {
       requireUserId(context);
-      return prisma.galleryItem.update({
+      const { url, thumbnailUrl, eventId } = args.input;
+      const previous = await prisma.galleryItem.findUniqueOrThrow({ where: { id: args.id } });
+      const updated = await prisma.galleryItem.update({
         where: { id: args.id },
-        data: args.input,
+        data: {
+          ...(url ? { url } : {}),
+          ...(thumbnailUrl !== undefined ? { thumbnailUrl } : {}),
+          // `eventId: null` means "no event"; leaving it out keeps the current one.
+          ...(eventId !== undefined ? { eventId } : {}),
+        },
       });
+      // A replaced photo leaves its old file behind in Storage - remove it,
+      // like updateEvent does for posters.
+      if (previous.type === "PHOTO" && url && url !== previous.url) {
+        await deletePhoto(previous.url).catch((error) => {
+          console.error("Failed to delete replaced photo from storage:", error);
+        });
+      }
+      return updated;
     },
     deleteGalleryItem: async (
       _: unknown,

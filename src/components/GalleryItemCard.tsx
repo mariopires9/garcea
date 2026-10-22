@@ -2,7 +2,6 @@ import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardActionArea from "@mui/material/CardActionArea";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import { isFacebookEmbedUrl } from "@/lib/video";
 
 type GalleryItem = {
@@ -10,7 +9,6 @@ type GalleryItem = {
   type: "PHOTO" | "VIDEO";
   url: string;
   thumbnailUrl?: string | null;
-  caption?: string | null;
 };
 
 function withAutoplay(url: string): string {
@@ -49,7 +47,7 @@ export function GalleryItemCard({
     <CardMedia
       component="img"
       image={item.thumbnailUrl ?? item.url}
-      alt={item.caption ?? ""}
+      alt=""
       // Only download photos as they scroll into view.
       loading="lazy"
       decoding="async"
@@ -78,7 +76,7 @@ export function GalleryItemCard({
         onPhotoClick ? (
           <CardActionArea
             onClick={onPhotoClick}
-            aria-label={item.caption ? `Ampliar: ${item.caption}` : "Ampliar foto"}
+            aria-label="Ampliar foto"
             sx={{
               cursor: "zoom-in",
               ...(fillHeight && { flex: 1, minHeight: 0, display: "flex" }),
@@ -93,7 +91,7 @@ export function GalleryItemCard({
         <Box
           component="iframe"
           src={autoPlay ? withAutoplay(item.url) : item.url}
-          title={item.caption ?? "Vídeo"}
+          title="Vídeo"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerPolicy="strict-origin-when-cross-origin"
           loading="lazy"
@@ -104,15 +102,6 @@ export function GalleryItemCard({
               : { aspectRatio: "16 / 9", width: "100%", border: 0, display: "block" }
           }
         />
-      )}
-      {item.caption && (
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ px: 1, py: 0.5, display: "block" }}
-        >
-          {item.caption}
-        </Typography>
       )}
     </Card>
   );

@@ -48,12 +48,16 @@ export function GalleryItemForm({
         </FormControl>
 
         <FormControl fullWidth>
-          <InputLabel id="event-label">Evento (opcional)</InputLabel>
+          <InputLabel id="event-label" shrink>
+            Evento (opcional)
+          </InputLabel>
           <Select
             labelId="event-label"
             label="Evento (opcional)"
             name="eventId"
             defaultValue=""
+            displayEmpty
+            notched
           >
             <MenuItem value="">Nenhum</MenuItem>
             {events.map((event) => (
@@ -99,14 +103,6 @@ export function GalleryItemForm({
             helperText="Cole o link normal do vídeo, tal como aparece no YouTube ou no Facebook"
           />
         )}
-
-        <TextField
-          label="Legenda (opcional)"
-          name="caption"
-          helperText={
-            type === "PHOTO" ? "Aplicada a todas as fotos enviadas aqui" : undefined
-          }
-        />
 
         <SubmitButton variant="contained" sx={{ alignSelf: "flex-start" }}>
           Enviar
