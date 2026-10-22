@@ -20,8 +20,11 @@ import { PageContainer } from "@/components/PageContainer";
 import { BackButton } from "@/components/BackButton";
 import { PageTitle } from "@/components/PageTitle";
 import { FlashMessage } from "@/components/FlashMessage";
+import { ShowMoreButton } from "@/components/ShowMoreButton";
+import { GALLERY_PAGE_SIZE, parseGalleryLimit } from "@/lib/gallery-paging";
 
 type GalleryData = {
+  galleryItemsCount: number;
   galleryItems: {
     id: string;
     type: "PHOTO" | "VIDEO";
@@ -37,9 +40,10 @@ type EventsData = { events: { id: string; title: string; date: string }[] };
 export default async function ManageGalleryPage({
   searchParams,
 }: {
-  searchParams: Promise<{ success?: string; eventId?: string; year?: string }>;
+  searchParams: Promise<{ success?: string; eventId?: string; year?: string; limit?: string }>;
 }) {
-  const { success, eventId, year } = await searchParams;
+  const { success, eventId, year, limit: limitParam } = await searchParams;
+  const limit = parseGalleryLimit(limitParam);
   const eventsData = await executeGraphQL<EventsData>(EVENT_OPTIONS_QUERY);
   // Rebuild as plain object literals: GraphQL execution results aren't
   // guaranteed to be plain objects (Next.js rejects non-plain-object/
@@ -62,7 +66,14 @@ export default async function ManageGalleryPage({
   const data = await executeGraphQL<GalleryData>(GALLERY_ITEMS_QUERY, {
     eventId: eventId || null,
     year: selectedYear ?? null,
+    limit,
   });
+
+  // "Ver mais" keeps the current filters and asks for one more page.
+  const showMoreParams = new URLSearchParams();
+  if (selectedYear !== undefined) showMoreParams.set("year", String(selectedYear));
+  if (eventId) showMoreParams.set("eventId", eventId);
+  showMoreParams.set("limit", String(limit + GALLERY_PAGE_SIZE));
 
   return (
     <PageContainer maxWidth="md">
@@ -150,6 +161,14 @@ export default async function ManageGalleryPage({
             </Box>
           </GalleryLightboxProvider>
         </GallerySelectionProvider>
+      )}
+
+      {data.galleryItemsCount > data.galleryItems.length && (
+        <ShowMoreButton
+          href={`/manage/gallery?${showMoreParams}`}
+          shown={data.galleryItems.length}
+          total={data.galleryItemsCount}
+        />
       )}
     </PageContainer>
   );

@@ -113,6 +113,8 @@ function LightboxContent({
                 component="img"
                 src={photo.url}
                 alt={photo.caption ?? ""}
+                // Every slide is rendered, so only fetch the ones being viewed.
+                loading="lazy"
                 sx={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", userSelect: "none" }}
                 draggable={false}
               />

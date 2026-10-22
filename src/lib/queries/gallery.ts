@@ -1,6 +1,7 @@
 export const GALLERY_ITEMS_QUERY = /* GraphQL */ `
-  query GalleryItems($eventId: ID, $year: Int) {
-    galleryItems(eventId: $eventId, year: $year) {
+  query GalleryItems($eventId: ID, $year: Int, $limit: Int) {
+    galleryItemsCount(eventId: $eventId, year: $year)
+    galleryItems(eventId: $eventId, year: $year, limit: $limit) {
       id
       type
       url

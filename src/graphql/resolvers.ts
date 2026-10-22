@@ -47,28 +47,40 @@ function toISOString(value: Date): string {
   return value.toISOString();
 }
 
+type GalleryItemsFilter = { eventId?: string | null; year?: number | null };
+
+function galleryItemsWhere(args: GalleryItemsFilter) {
+  return {
+    ...(args.eventId ? { eventId: args.eventId } : {}),
+    ...(args.year
+      ? {
+          event: {
+            date: {
+              gte: new Date(`${args.year}-01-01T00:00:00.000Z`),
+              lt: new Date(`${args.year + 1}-01-01T00:00:00.000Z`),
+            },
+          },
+        }
+      : {}),
+  };
+}
+
 export const resolvers = {
   Query: {
     events: () => prisma.event.findMany({ orderBy: { date: "desc" } }),
     event: (_: unknown, args: { id: string }) =>
       prisma.event.findUnique({ where: { id: args.id } }),
-    galleryItems: (_: unknown, args: { eventId?: string | null; year?: number | null }) =>
+    galleryItems: (
+      _: unknown,
+      args: GalleryItemsFilter & { limit?: number | null },
+    ) =>
       prisma.galleryItem.findMany({
-        where: {
-          ...(args.eventId ? { eventId: args.eventId } : {}),
-          ...(args.year
-            ? {
-                event: {
-                  date: {
-                    gte: new Date(`${args.year}-01-01T00:00:00.000Z`),
-                    lt: new Date(`${args.year + 1}-01-01T00:00:00.000Z`),
-                  },
-                },
-              }
-            : {}),
-        },
+        where: galleryItemsWhere(args),
         orderBy: { createdAt: "desc" },
+        ...(args.limit ? { take: Math.max(1, args.limit) } : {}),
       }),
+    galleryItemsCount: (_: unknown, args: GalleryItemsFilter) =>
+      prisma.galleryItem.count({ where: galleryItemsWhere(args) }),
     galleryItem: (_: unknown, args: { id: string }) =>
       prisma.galleryItem.findUnique({ where: { id: args.id } }),
     homeSections: () => prisma.homeSection.findMany({ orderBy: { order: "asc" } }),

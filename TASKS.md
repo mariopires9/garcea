@@ -949,6 +949,36 @@ Derived from [PLAN.md](./PLAN.md). Check items off as they're completed.
 - Not done: a changed name/email shows on `/manage` ("Sessão iniciada
   como …") only after logging in again, because it's read from the JWT.
 
+## Gallery batches ("Ver mais") + lazy loading
+
+- [x] `/gallery` and `/manage/gallery` show 24 items at a time
+      (`GALLERY_PAGE_SIZE` in `src/lib/gallery-paging.ts`); "Ver mais"
+      (`src/components/ShowMoreButton.tsx`) adds 24 more by raising
+      `?limit=` in the URL, with "A mostrar N de M" above it. It navigates
+      inside a React transition with `scroll: false`, so the page keeps its
+      scroll position and the items already shown stay on screen (no
+      loading-skeleton flash). The URL keeps the state, so reload/back
+      work.
+- [x] GraphQL: `galleryItems` takes an optional `limit` (no limit = all,
+      still used by the bulk-delete confirmation page) and there's a new
+      `galleryItemsCount(eventId, year)`; both share one `where` builder.
+- [x] `/manage/gallery`: "Ver mais" keeps the year/event filter; changing
+      the filter starts again at the first 24 (the filter component builds
+      a fresh URL). The selection survives "Ver mais" (provider is keyed by
+      the filter only) and "Selecionar todos" covers every item shown.
+- [x] `loading="lazy"` on gallery card photos and video iframes (the
+      YouTube/Facebook players were all loading up front) and on the
+      lightbox slides (every slide is rendered, so opening the viewer used
+      to download every full-size photo in the group).
+- Verified in headless Chromium with the page size temporarily set to 8
+  (the gallery has 21 items now): 8 -> 16 items, scrollY unchanged, no
+  skeleton flash, "A mostrar 16 de 21"; on `/manage/gallery` 2 selected
+  items stayed selected after "Ver mais", select-all covered 16, and
+  `?year=2026` survived "Ver mais". Restored to 24 afterwards.
+- Measured: Chrome's lazy-load distance is generous (~1250px+), so on a
+  short page most photos still load right away - the batches are what cap
+  it. The bigger remaining win is thumbnails (see backlog).
+
 ## Backlog: improvement ideas (free-tier aware)
 
 From a functionality review. Ordered roughly by value; constraints of the
@@ -979,8 +1009,16 @@ Vercel Hobby + Supabase free plans are noted where they matter.
       every DB query crossed the Atlantic (~2s for `/`). Hobby allows one
       region of your choice. Check the next request logs for the new
       region and execution time.
-- [ ] Gallery pagination / lazy loading (`/gallery` currently fetches and
-      renders every item) - also saves Supabase egress.
+- [x] Gallery pagination / lazy loading (`/gallery` currently fetches and
+      renders every item) - also saves Supabase egress. See "Gallery
+      batches ("Ver mais") + lazy loading" below.
+- [ ] Gallery thumbnails: grid tiles show the full ~1920px photo (~290KB
+      each - 20 photos measured at 5.8MB) inside a small square. Generate a
+      small (~400px) thumbnail in the browser at upload time, next to the
+      existing compression, and save it in the unused
+      `GalleryItem.thumbnailUrl` (`GalleryItemCard` already prefers it).
+      Supabase image transforms are Pro-only, so it has to be done at
+      upload; existing photos would need a one-off backfill.
 - [x] Keep uploads under Vercel's 4.5MB request body limit (chose a
       simple cap instead of one-request-per-photo uploads):
       `src/lib/upload-limits.ts` sets max 15 photos per gallery upload and

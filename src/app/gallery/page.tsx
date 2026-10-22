@@ -8,10 +8,13 @@ import { GalleryGrid } from "@/components/GalleryGrid";
 import { PageContainer } from "@/components/PageContainer";
 import { PageTitle } from "@/components/PageTitle";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { ShowMoreButton } from "@/components/ShowMoreButton";
+import { GALLERY_PAGE_SIZE, parseGalleryLimit } from "@/lib/gallery-paging";
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/site";
 
 type GalleryData = {
+  galleryItemsCount: number;
   galleryItems: {
     id: string;
     type: "PHOTO" | "VIDEO";
@@ -29,8 +32,13 @@ export const metadata: Metadata = pageMetadata({
   path: "/gallery",
 });
 
-export default async function GalleryPage() {
-  const data = await executeGraphQL<GalleryData>(GALLERY_ITEMS_QUERY);
+export default async function GalleryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ limit?: string }>;
+}) {
+  const limit = parseGalleryLimit((await searchParams).limit);
+  const data = await executeGraphQL<GalleryData>(GALLERY_ITEMS_QUERY, { limit });
 
   if (data.galleryItems.length === 0) {
     return (
@@ -76,6 +84,13 @@ export default async function GalleryPage() {
           </Stack>
         </ScrollReveal>
       ))}
+      {data.galleryItemsCount > data.galleryItems.length && (
+        <ShowMoreButton
+          href={`/gallery?limit=${limit + GALLERY_PAGE_SIZE}`}
+          shown={data.galleryItems.length}
+          total={data.galleryItemsCount}
+        />
+      )}
     </PageContainer>
   );
 }

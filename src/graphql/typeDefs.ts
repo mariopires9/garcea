@@ -146,7 +146,9 @@ export const typeDefs = /* GraphQL */ `
   type Query {
     events: [Event!]!
     event(id: ID!): Event
-    galleryItems(eventId: ID, year: Int): [GalleryItem!]!
+    "Newest first. Without \`limit\` returns every matching item."
+    galleryItems(eventId: ID, year: Int, limit: Int): [GalleryItem!]!
+    galleryItemsCount(eventId: ID, year: Int): Int!
     galleryItem(id: ID!): GalleryItem
     homeSections: [HomeSection!]!
     homeSection(id: ID!): HomeSection

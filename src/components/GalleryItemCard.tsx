@@ -50,6 +50,9 @@ export function GalleryItemCard({
       component="img"
       image={item.thumbnailUrl ?? item.url}
       alt={item.caption ?? ""}
+      // Only download photos as they scroll into view.
+      loading="lazy"
+      decoding="async"
       sx={
         fillHeight
           ? { flex: 1, minHeight: 0, width: "100%", objectFit: "cover" }
@@ -93,6 +96,7 @@ export function GalleryItemCard({
           title={item.caption ?? "Vídeo"}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerPolicy="strict-origin-when-cross-origin"
+          loading="lazy"
           allowFullScreen
           sx={
             fillHeight
