@@ -170,6 +170,29 @@ export const resolvers = {
       return true;
     },
 
+    deleteGalleryItems: async (
+      _: unknown,
+      args: { ids: string[] },
+      context: GraphQLContext,
+    ) => {
+      requireUserId(context);
+      // One transaction for the rows (all or nothing); Storage cleanup after,
+      // logged rather than failing the request, like deleteGalleryItem.
+      const items = await prisma.$transaction(async (tx) => {
+        const found = await tx.galleryItem.findMany({ where: { id: { in: args.ids } } });
+        await tx.galleryItem.deleteMany({ where: { id: { in: found.map((item) => item.id) } } });
+        return found;
+      });
+      for (const item of items) {
+        if (item.type === "PHOTO") {
+          await deletePhoto(item.url).catch((error) => {
+            console.error("Failed to delete photo from storage:", error);
+          });
+        }
+      }
+      return items.length;
+    },
+
     createHomeSection: async (
       _: unknown,
       args: { input: HomeSectionInput },

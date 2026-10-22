@@ -51,3 +51,9 @@ export const DELETE_GALLERY_ITEM_MUTATION = /* GraphQL */ `
     deleteGalleryItem(id: $id)
   }
 `;
+
+export const DELETE_GALLERY_ITEMS_MUTATION = /* GraphQL */ `
+  mutation DeleteGalleryItems($ids: [ID!]!) {
+    deleteGalleryItems(ids: $ids)
+  }
+`;

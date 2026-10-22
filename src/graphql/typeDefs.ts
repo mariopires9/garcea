@@ -149,6 +149,7 @@ export const typeDefs = /* GraphQL */ `
     createGalleryItem(input: GalleryItemInput!): GalleryItem!
     updateGalleryItem(id: ID!, input: GalleryItemUpdateInput!): GalleryItem!
     deleteGalleryItem(id: ID!): Boolean!
+    deleteGalleryItems(ids: [ID!]!): Int!
 
     createHomeSection(input: HomeSectionInput!): HomeSection!
     updateHomeSection(id: ID!, input: HomeSectionInput!): HomeSection!

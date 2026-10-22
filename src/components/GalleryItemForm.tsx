@@ -4,6 +4,7 @@ import { useState } from "react";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import Alert from "@mui/material/Alert";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select, { type SelectChangeEvent } from "@mui/material/Select";
@@ -11,6 +12,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { FormCard } from "@/components/FormCard";
 import { SubmitButton } from "@/components/SubmitButton";
 import { ImageCompressingForm } from "@/components/ImageCompressingForm";
+import { MAX_PHOTOS_PER_UPLOAD } from "@/lib/upload-limits";
 
 type EventOption = { id: string; title: string };
 
@@ -24,6 +26,7 @@ export function GalleryItemForm({
   error?: string;
 }) {
   const [type, setType] = useState<"PHOTO" | "VIDEO">("PHOTO");
+  const [photoError, setPhotoError] = useState<string | null>(null);
 
   return (
     <FormCard error={error}>
@@ -64,9 +67,27 @@ export function GalleryItemForm({
         {type === "PHOTO" ? (
           <Stack spacing={0.5}>
             <Typography variant="body2" color="text.secondary">
-              Ficheiros de foto (selecione vários para enviar todos de uma vez)
+              Ficheiros de foto (até {MAX_PHOTOS_PER_UPLOAD} de cada vez)
             </Typography>
-            <input type="file" name="photo" accept="image/*" multiple required />
+            <input
+              type="file"
+              name="photo"
+              accept="image/*"
+              multiple
+              required
+              onChange={(event) => {
+                const count = event.target.files?.length ?? 0;
+                if (count > MAX_PHOTOS_PER_UPLOAD) {
+                  event.target.value = "";
+                  setPhotoError(
+                    `Selecionou ${count} fotos. Pode enviar no máximo ${MAX_PHOTOS_PER_UPLOAD} de cada vez.`,
+                  );
+                } else {
+                  setPhotoError(null);
+                }
+              }}
+            />
+            {photoError && <Alert severity="warning">{photoError}</Alert>}
           </Stack>
         ) : (
           <TextField

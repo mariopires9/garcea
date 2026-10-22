@@ -10,10 +10,12 @@ import {
 import { withFlash } from "@/lib/flash";
 import { uploadPhoto, deletePhoto } from "@/lib/supabase-storage";
 import { normalizeVideoUrl } from "@/lib/video";
+import { MAX_PHOTOS_PER_UPLOAD } from "@/lib/upload-limits";
 import {
   CREATE_GALLERY_ITEM_MUTATION,
   UPDATE_GALLERY_ITEM_MUTATION,
   DELETE_GALLERY_ITEM_MUTATION,
+  DELETE_GALLERY_ITEMS_MUTATION,
 } from "@/lib/queries/gallery";
 
 function readCaption(formData: FormData) {
@@ -54,6 +56,13 @@ export async function createGalleryItemAction(formData: FormData) {
       redirect(
         withFlash("/manage/gallery/new", {
           error: "Escolha pelo menos uma foto para enviar.",
+        }),
+      );
+    }
+    if (files.length > MAX_PHOTOS_PER_UPLOAD) {
+      redirect(
+        withFlash("/manage/gallery/new", {
+          error: `Pode enviar no máximo ${MAX_PHOTOS_PER_UPLOAD} fotos de cada vez.`,
         }),
       );
     }
@@ -121,5 +130,27 @@ export async function deleteGalleryItemAction(id: string) {
   revalidatePath("/manage/gallery");
   redirect(
     withFlash("/manage/gallery", { success: "Item eliminado com sucesso." }),
+  );
+}
+
+export async function deleteGalleryItemsAction(formData: FormData) {
+  const ids = formData
+    .getAll("id")
+    .filter((entry): entry is string => typeof entry === "string" && entry !== "");
+  // The UI never submits an empty selection; nothing to report if it does.
+  if (ids.length === 0) redirect("/manage/gallery");
+
+  const data = await runGatedMutation(() =>
+    executeGraphQL<{ deleteGalleryItems: number }>(DELETE_GALLERY_ITEMS_MUTATION, { ids }),
+  );
+  const count = data.deleteGalleryItems;
+
+  revalidatePath("/gallery");
+  revalidatePath("/manage/gallery");
+  redirect(
+    withFlash("/manage/gallery", {
+      success:
+        count === 1 ? "1 item eliminado com sucesso." : `${count} itens eliminados com sucesso.`,
+    }),
   );
 }

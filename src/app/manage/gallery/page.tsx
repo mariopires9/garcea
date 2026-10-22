@@ -10,6 +10,11 @@ import {
   GalleryLightboxProvider,
   ZoomableGalleryItemCard,
 } from "@/components/GalleryLightbox";
+import {
+  GallerySelectionProvider,
+  GallerySelectionToolbar,
+  SelectableGalleryItem,
+} from "@/components/GallerySelection";
 import { GalleryFilters } from "@/components/GalleryFilters";
 import { PageContainer } from "@/components/PageContainer";
 import { BackButton } from "@/components/BackButton";
@@ -94,48 +99,57 @@ export default async function ManageGalleryPage({
               : "Ainda não há itens na galeria."}
         </Typography>
       ) : (
-        <GalleryLightboxProvider
-          photos={data.galleryItems
-            .filter((item) => item.type === "PHOTO")
-            .map((item) => ({ id: item.id, url: item.url, caption: item.caption }))}
+        <GallerySelectionProvider
+          // Reset the selection whenever the filter changes.
+          key={`${eventId ?? ""}-${selectedYear ?? ""}`}
+          allIds={data.galleryItems.map((item) => item.id)}
         >
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(3, 1fr)" },
-              gap: 3,
-            }}
+          <GallerySelectionToolbar />
+          <GalleryLightboxProvider
+            photos={data.galleryItems
+              .filter((item) => item.type === "PHOTO")
+              .map((item) => ({ id: item.id, url: item.url, caption: item.caption }))}
           >
-            {data.galleryItems.map((item) => (
-              <Stack key={item.id} spacing={1}>
-                <ZoomableGalleryItemCard
-                  item={{
-                    id: item.id,
-                    type: item.type,
-                    url: item.url,
-                    thumbnailUrl: item.thumbnailUrl,
-                    caption: item.caption,
-                  }}
-                />
-                <Typography variant="caption" color="text.secondary">
-                  {item.event?.title ?? "Sem evento"}
-                </Typography>
-                <Stack direction="row" spacing={2}>
-                  <Button href={`/manage/gallery/${item.id}/edit`} size="small">
-                    Editar legenda
-                  </Button>
-                  <Button
-                    href={`/manage/gallery/${item.id}/delete`}
-                    size="small"
-                    color="error"
-                  >
-                    Eliminar
-                  </Button>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(3, 1fr)" },
+                gap: 3,
+              }}
+            >
+              {data.galleryItems.map((item) => (
+                <Stack key={item.id} spacing={1}>
+                  <SelectableGalleryItem id={item.id}>
+                    <ZoomableGalleryItemCard
+                      item={{
+                        id: item.id,
+                        type: item.type,
+                        url: item.url,
+                        thumbnailUrl: item.thumbnailUrl,
+                        caption: item.caption,
+                      }}
+                    />
+                  </SelectableGalleryItem>
+                  <Typography variant="caption" color="text.secondary">
+                    {item.event?.title ?? "Sem evento"}
+                  </Typography>
+                  <Stack direction="row" spacing={2}>
+                    <Button href={`/manage/gallery/${item.id}/edit`} size="small">
+                      Editar legenda
+                    </Button>
+                    <Button
+                      href={`/manage/gallery/${item.id}/delete`}
+                      size="small"
+                      color="error"
+                    >
+                      Eliminar
+                    </Button>
+                  </Stack>
                 </Stack>
-              </Stack>
-            ))}
-          </Box>
-        </GalleryLightboxProvider>
+              ))}
+            </Box>
+          </GalleryLightboxProvider>
+        </GallerySelectionProvider>
       )}
     </PageContainer>
   );

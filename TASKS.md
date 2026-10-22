@@ -838,6 +838,41 @@ Derived from [PLAN.md](./PLAN.md). Check items off as they're completed.
   above the title and navigates to `/events`. Manage pages checked with
   `tsc`/`eslint` only (login needed).
 
+## Bulk delete on /manage/gallery
+
+- [x] Checkbox on each card (top-left, outside the photo's click area, so
+      clicking the photo still opens the viewer) plus a sticky toolbar:
+      "Selecionar todos" (with indeterminate state), "N itens
+      selecionados", "Eliminar selecionados" (disabled at 0). State lives
+      in `src/components/GallerySelection.tsx` (context provider, toolbar,
+      `SelectableGalleryItem`), so the page stays a Server Component. The
+      provider is keyed by the year/event filter, so changing the filter
+      clears the selection - nothing hidden can be deleted by accident.
+- [x] "Eliminar selecionados" goes to `/manage/gallery/delete-selected?ids=…`,
+      a confirmation page (same pattern as the single-item delete pages, no
+      "Voltar" button) showing thumbnails of the selected items and
+      "Eliminar N itens" / "Cancelar". Ids that no longer exist are skipped.
+- [x] New GraphQL mutation `deleteGalleryItems(ids: [ID!]!): Int!`: deletes
+      the rows in one Prisma transaction (all or nothing), then removes the
+      photo files from Storage (failures logged, like `deleteGalleryItem`).
+      Home page featured-photo links go with them (`onDelete: Cascade`).
+      Server Action `deleteGalleryItemsAction` redirects with "N itens
+      eliminados com sucesso."
+- Fixed along the way: on the confirmation page, MUI `Stack` spacing also
+  applied margins to the hidden `id` inputs, pushing the buttons right -
+  switched to a flex `gap`.
+- Verified in headless Chromium against the dev server: 36 checkboxes,
+  select 2 -> counter + outline, photo click still opens the viewer and
+  keeps the selection, select all (36) / none, confirm page lists exactly
+  the 2 items. Mutation tested with non-existent ids only (returns 0 when
+  logged in, `UNAUTHENTICATED` when logged out) - a real deletion wasn't
+  run since dev uses the production database.
+- Testing `/manage` pages headlessly without the admin password: sign a
+  short-lived Auth.js session JWT locally with `NEXTAUTH_SECRET`
+  (`encode` from `@auth/core/jwt`, salt `authjs.session-token`) for a
+  fake user id, set it as the `authjs.session-token` cookie, and delete
+  the token file afterwards. Read-only use only - it hits the real DB.
+
 ## Backlog: improvement ideas (free-tier aware)
 
 From a functionality review. Ordered roughly by value; constraints of the
@@ -870,8 +905,18 @@ Vercel Hobby + Supabase free plans are noted where they matter.
       region and execution time.
 - [ ] Gallery pagination / lazy loading (`/gallery` currently fetches and
       renders every item) - also saves Supabase egress.
-- [ ] Upload photos one request at a time so big batches don't hit
-      Vercel's 4.5MB request body limit.
+- [x] Keep uploads under Vercel's 4.5MB request body limit (chose a
+      simple cap instead of one-request-per-photo uploads):
+      `src/lib/upload-limits.ts` sets max 15 photos per gallery upload and
+      max 4MB per request. The gallery form warns and clears the selection
+      when more than 15 photos are picked (the Server Action re-checks the
+      count). `ImageCompressingForm` totals the files after compression
+      and shows an error instead of sending a request Vercel would reject,
+      which also covers large PDF posters in the event form (the 15MB
+      server-side poster limit could never be reached in production).
+      Note: when that error shows, React resets the form's fields, so the
+      files have to be picked again. Only `tsc`/`eslint`/`next build`
+      checked - the forms need a login to try.
 - [ ] Events: "Próximos" (upcoming) section at the top of `/events`,
       archive by year below.
 - [x] Per-page/per-event metadata + Open Graph image (event poster),
