@@ -10,6 +10,7 @@ import Select, { type SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { FormCard } from "@/components/FormCard";
 import { SubmitButton } from "@/components/SubmitButton";
+import { ImageCompressingForm } from "@/components/ImageCompressingForm";
 
 type EventOption = { id: string; title: string };
 
@@ -26,7 +27,7 @@ export function GalleryItemForm({
 
   return (
     <FormCard error={error}>
-      <Stack component="form" action={action} spacing={2}>
+      <ImageCompressingForm action={action} imageField="photo" maxDimension={1920}>
         <FormControl fullWidth>
           <InputLabel id="type-label">Tipo</InputLabel>
           <Select
@@ -89,7 +90,7 @@ export function GalleryItemForm({
         <SubmitButton variant="contained" sx={{ alignSelf: "flex-start" }}>
           Enviar
         </SubmitButton>
-      </Stack>
+      </ImageCompressingForm>
     </FormCard>
   );
 }

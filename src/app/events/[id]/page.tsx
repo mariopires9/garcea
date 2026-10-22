@@ -9,6 +9,7 @@ import { executeGraphQL } from "@/lib/graphql-server";
 import { EVENT_QUERY } from "@/lib/queries/events";
 import { GalleryCarousel } from "@/components/GalleryCarousel";
 import { PageContainer } from "@/components/PageContainer";
+import { BackButton } from "@/components/BackButton";
 import { PageTitle } from "@/components/PageTitle";
 import { isPdfUrl } from "@/lib/supabase-storage";
 import { EVENT_TYPE_LABELS } from "@/lib/eventTypes";
@@ -47,6 +48,7 @@ export default async function EventDetailPage({
 
   return (
     <PageContainer maxWidth="md">
+      <BackButton href="/events" />
       <PageTitle icon={<EventIcon />}>{event.title}</PageTitle>
       <Stack direction="row" spacing={1} sx={{ alignItems: "center", flexWrap: "wrap" }}>
         <Chip

@@ -5,6 +5,7 @@ import Stack from "@mui/material/Stack";
 import { executeGraphQL } from "@/lib/graphql-server";
 import { GALLERY_ITEM_QUERY } from "@/lib/queries/gallery";
 import { PageContainer } from "@/components/PageContainer";
+import { BackButton } from "@/components/BackButton";
 import { FormCard } from "@/components/FormCard";
 import { SubmitButton } from "@/components/SubmitButton";
 import { updateGalleryItemAction } from "../../actions";
@@ -25,6 +26,7 @@ export default async function EditGalleryItemPage({
 
   return (
     <PageContainer maxWidth="sm">
+      <BackButton href="/manage/gallery" />
       <Typography variant="h4" component="h1">
         Editar Legenda
       </Typography>

@@ -8,6 +8,7 @@ import ViewAgendaIcon from "@mui/icons-material/ViewAgenda";
 import { executeGraphQL } from "@/lib/graphql-server";
 import { HOME_SECTIONS_QUERY } from "@/lib/queries/homeSections";
 import { PageContainer } from "@/components/PageContainer";
+import { BackButton } from "@/components/BackButton";
 import { PageTitle } from "@/components/PageTitle";
 import { HomeSectionForm } from "@/components/HomeSectionForm";
 import { SubmitIconButton } from "@/components/SubmitIconButton";
@@ -34,6 +35,7 @@ export default async function ManageHomeSectionsPage({
 
   return (
     <PageContainer maxWidth="md">
+      <BackButton href="/manage" />
       <PageTitle icon={<ViewAgendaIcon />} color="secondary">
         Gerir Secções da Página Inicial
       </PageTitle>

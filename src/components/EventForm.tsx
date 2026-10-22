@@ -9,6 +9,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { isPdfUrl } from "@/lib/supabase-storage";
 import { FormCard } from "@/components/FormCard";
 import { SubmitButton } from "@/components/SubmitButton";
+import { ImageCompressingForm } from "@/components/ImageCompressingForm";
 
 type EventFormValues = {
   title: string;
@@ -39,7 +40,8 @@ export function EventForm({
 }) {
   return (
     <FormCard error={error}>
-      <Stack component="form" action={action} spacing={2}>
+      {/* Posters often carry small text, so keep more resolution than gallery photos. */}
+      <ImageCompressingForm action={action} imageField="cartaz" maxDimension={2560}>
         <TextField label="Título" name="title" required defaultValue={defaultValues?.title} />
         <TextField
           label="Descrição"
@@ -107,7 +109,7 @@ export function EventForm({
         <SubmitButton variant="contained" sx={{ alignSelf: "flex-start" }}>
           {submitLabel}
         </SubmitButton>
-      </Stack>
+      </ImageCompressingForm>
     </FormCard>
   );
 }

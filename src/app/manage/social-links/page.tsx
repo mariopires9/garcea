@@ -8,6 +8,7 @@ import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { executeGraphQL } from "@/lib/graphql-server";
 import { SOCIAL_LINKS_QUERY } from "@/lib/queries/socialLinks";
 import { PageContainer } from "@/components/PageContainer";
+import { BackButton } from "@/components/BackButton";
 import { PageTitle } from "@/components/PageTitle";
 import { SocialLinkForm } from "@/components/SocialLinkForm";
 import { SubmitIconButton } from "@/components/SubmitIconButton";
@@ -30,6 +31,7 @@ export default async function ManageSocialLinksPage({
 
   return (
     <PageContainer maxWidth="sm">
+      <BackButton href="/manage" />
       <PageTitle icon={<ShareIcon />}>Gerir Redes Sociais</PageTitle>
       <Typography color="text.secondary">
         Estes links são mostrados no rodapé de todas as páginas, pela ordem

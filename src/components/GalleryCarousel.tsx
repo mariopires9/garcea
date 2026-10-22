@@ -7,6 +7,7 @@ import IconButton from "@mui/material/IconButton";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { GalleryItemCard } from "@/components/GalleryItemCard";
+import { PhotoLightbox } from "@/components/PhotoLightbox";
 
 type GalleryItem = {
   id: string;
@@ -21,6 +22,7 @@ export function GalleryCarousel({ items }: { items: GalleryItem[] }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -39,6 +41,8 @@ export function GalleryCarousel({ items }: { items: GalleryItem[] }) {
   }, [emblaApi, onSelect]);
 
   if (items.length === 0) return null;
+
+  const photos = items.filter((item) => item.type === "PHOTO");
 
   return (
     <Box sx={{ position: "relative" }}>
@@ -66,6 +70,7 @@ export function GalleryCarousel({ items }: { items: GalleryItem[] }) {
                 autoPlay={index === selectedIndex}
                 fillHeight
                 hoverLift={false}
+                onPhotoClick={() => setLightboxIndex(photos.indexOf(item))}
               />
             </Box>
           ))}
@@ -130,6 +135,12 @@ export function GalleryCarousel({ items }: { items: GalleryItem[] }) {
           </Box>
         </>
       )}
+
+      <PhotoLightbox
+        photos={photos}
+        openIndex={lightboxIndex}
+        onClose={() => setLightboxIndex(null)}
+      />
     </Box>
   );
 }

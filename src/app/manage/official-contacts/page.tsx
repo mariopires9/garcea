@@ -6,6 +6,7 @@ import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
 import { executeGraphQL } from "@/lib/graphql-server";
 import { OFFICIAL_CONTACTS_QUERY } from "@/lib/queries/officialContacts";
 import { PageContainer } from "@/components/PageContainer";
+import { BackButton } from "@/components/BackButton";
 import { PageTitle } from "@/components/PageTitle";
 import { OfficialContactForm } from "@/components/OfficialContactForm";
 import { FlashMessage } from "@/components/FlashMessage";
@@ -34,6 +35,7 @@ export default async function ManageOfficialContactsPage({
 
   return (
     <PageContainer maxWidth="sm">
+      <BackButton href="/manage" />
       <PageTitle icon={<ContactPhoneIcon />}>Gerir Contactos Oficiais</PageTitle>
       <Typography color="text.secondary">
         Estes emails e números de telefone são mostrados na página pública de

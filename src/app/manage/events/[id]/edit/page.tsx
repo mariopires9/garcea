@@ -4,6 +4,7 @@ import { executeGraphQL } from "@/lib/graphql-server";
 import { EVENT_QUERY } from "@/lib/queries/events";
 import { EventForm } from "@/components/EventForm";
 import { PageContainer } from "@/components/PageContainer";
+import { BackButton } from "@/components/BackButton";
 import { updateEventAction } from "../../actions";
 
 type EventData = {
@@ -33,6 +34,7 @@ export default async function EditEventPage({
 
   return (
     <PageContainer maxWidth="sm">
+      <BackButton href="/manage/events" />
       <Typography variant="h4" component="h1">
         Editar Evento
       </Typography>

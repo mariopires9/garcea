@@ -1,11 +1,10 @@
 import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Chip from "@mui/material/Chip";
 import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
 import { executeGraphQL } from "@/lib/graphql-server";
 import { GALLERY_ITEMS_QUERY } from "@/lib/queries/gallery";
-import { GalleryItemCard } from "@/components/GalleryItemCard";
+import { GalleryGrid } from "@/components/GalleryGrid";
 import { PageContainer } from "@/components/PageContainer";
 import { PageTitle } from "@/components/PageTitle";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -56,17 +55,15 @@ export default async function GalleryPage() {
               </Typography>
               <Chip size="small" color="primary" label={group.items.length} />
             </Stack>
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(3, 1fr)" },
-                gap: 2,
-              }}
-            >
-              {group.items.map((item) => (
-                <GalleryItemCard key={item.id} item={item} />
-              ))}
-            </Box>
+            <GalleryGrid
+              items={group.items.map((item) => ({
+                id: item.id,
+                type: item.type,
+                url: item.url,
+                thumbnailUrl: item.thumbnailUrl,
+                caption: item.caption,
+              }))}
+            />
           </Stack>
         </ScrollReveal>
       ))}

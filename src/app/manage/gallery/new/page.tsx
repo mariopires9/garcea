@@ -3,6 +3,7 @@ import { executeGraphQL } from "@/lib/graphql-server";
 import { EVENT_OPTIONS_QUERY } from "@/lib/queries/events";
 import { GalleryItemForm } from "@/components/GalleryItemForm";
 import { PageContainer } from "@/components/PageContainer";
+import { BackButton } from "@/components/BackButton";
 import { createGalleryItemAction } from "../actions";
 
 type EventsData = { events: { id: string; title: string }[] };
@@ -21,6 +22,7 @@ export default async function NewGalleryItemPage({
 
   return (
     <PageContainer maxWidth="sm">
+      <BackButton href="/manage/gallery" />
       <Typography variant="h4" component="h1">
         Adicionar Item à Galeria
       </Typography>

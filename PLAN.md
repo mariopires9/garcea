@@ -87,6 +87,24 @@ permissions.
 9. **Polish & deploy** — styling/responsiveness, deploy app to Vercel, verify Supabase
    connection in production
 
+## Free-Tier Constraints
+
+The site runs on Vercel Hobby and the Supabase free plan. These limits
+should drive design decisions:
+
+| Limit | Value | Implication |
+|---|---|---|
+| Supabase Storage | ~1GB | Compress photos in the browser before upload (done: `src/lib/compress-image.ts`); keep videos on YouTube/Facebook |
+| Supabase egress | ~5GB/month | Paginate/lazy-load the gallery instead of loading every photo |
+| Supabase database | 500MB, pauses after ~1 week idle | Keep-warm ping on the home page |
+| Vercel function request body | 4.5MB (ignores `bodySizeLimit`) | Large multi-photo uploads must be split into several requests |
+| Vercel image optimization | Limited quota | Don't route gallery photos through `next/image`; Supabase image transforms are Pro-only |
+| Vercel cron | Once per day max | Use an external free pinger if more frequent keep-warm runs are needed |
+| Vercel Hobby terms | Non-commercial use only | Fine for the association; no selling or ads on the site |
+
+Open backlog items are tracked in [TASKS.md](./TASKS.md) under
+"Backlog: improvement ideas".
+
 ## Open Questions
 
 - Is there a distinction wanted between the two admin-type accounts (e.g., a "primary"

@@ -1,5 +1,6 @@
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
+import CardActionArea from "@mui/material/CardActionArea";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { isFacebookEmbedUrl } from "@/lib/video";
@@ -35,12 +36,28 @@ export function GalleryItemCard({
   autoPlay = false,
   fillHeight = false,
   hoverLift = true,
+  onPhotoClick,
 }: {
   item: GalleryItem;
   autoPlay?: boolean;
   fillHeight?: boolean;
   hoverLift?: boolean;
+  /** When set, photos become clickable (e.g. to open a lightbox). */
+  onPhotoClick?: () => void;
 }) {
+  const photo = (
+    <CardMedia
+      component="img"
+      image={item.thumbnailUrl ?? item.url}
+      alt={item.caption ?? ""}
+      sx={
+        fillHeight
+          ? { flex: 1, minHeight: 0, width: "100%", objectFit: "cover" }
+          : { aspectRatio: "1 / 1", objectFit: "cover" }
+      }
+    />
+  );
+
   return (
     <Card
       variant="outlined"
@@ -55,16 +72,20 @@ export function GalleryItemCard({
       }}
     >
       {item.type === "PHOTO" ? (
-        <CardMedia
-          component="img"
-          image={item.thumbnailUrl ?? item.url}
-          alt={item.caption ?? ""}
-          sx={
-            fillHeight
-              ? { flex: 1, minHeight: 0, width: "100%", objectFit: "cover" }
-              : { aspectRatio: "1 / 1", objectFit: "cover" }
-          }
-        />
+        onPhotoClick ? (
+          <CardActionArea
+            onClick={onPhotoClick}
+            aria-label={item.caption ? `Ampliar: ${item.caption}` : "Ampliar foto"}
+            sx={{
+              cursor: "zoom-in",
+              ...(fillHeight && { flex: 1, minHeight: 0, display: "flex" }),
+            }}
+          >
+            {photo}
+          </CardActionArea>
+        ) : (
+          photo
+        )
       ) : (
         <Box
           component="iframe"

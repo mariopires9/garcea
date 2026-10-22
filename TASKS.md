@@ -756,6 +756,120 @@ Derived from [PLAN.md](./PLAN.md). Check items off as they're completed.
   now `32px`/`48px` at the two breakpoints (not just changed in source);
   `tsc --noEmit`, `eslint`, `next build` clean; every page still 200.
 
+## Client-side image compression on upload
+
+- Why: on the Supabase free tier (~1GB storage, ~5GB egress/month) raw
+  4-6MB phone photos would fill storage after a few hundred uploads.
+  Compressing in the browser (not with `next/image`, which would spend
+  the Vercel Hobby image-optimization quota; Supabase image transforms
+  are Pro-only) keeps photos at ~200-400KB.
+- [x] `src/lib/compress-image.ts`: resizes to a max dimension on a canvas
+      (EXIF orientation applied via `createImageBitmap`) and re-encodes as
+      WebP at 0.82 quality. Safari can't encode WebP (`toBlob` silently
+      returns PNG), so it falls back to JPEG there.
+- [x] Left untouched: PDFs, GIFs (may be animated), SVGs, formats the
+      browser can't decode (e.g. HEIC outside Safari), and any image where
+      the compressed result would be larger than the original. The
+      server-side 8MB/15MB checks in `supabase-storage.ts` still apply.
+- [x] `src/components/ImageCompressingForm.tsx`: form wrapper that
+      compresses the given file field inside the form action before calling
+      the Server Action, so `SubmitButton`'s pending spinner also covers the
+      compression time. Used by `GalleryItemForm` (`photo`, max 1920px) and
+      `EventForm` (`cartaz`, max 2560px, since posters carry small text).
+- Verified: `tsc --noEmit`, `eslint`, `next build` clean. Not yet
+  verified with a real upload in the browser.
+- Known issue (not fixed): `next.config.ts` sets `bodySizeLimit: "40mb"`,
+  but Vercel caps function request bodies at 4.5MB regardless. With
+  compression a typical multi-photo upload fits, but ~15+ photos in one
+  submit can still exceed it. Fix would be uploading photos one request
+  at a time - see backlog below.
+
+## Photo lightbox (click a photo to view it full-screen)
+
+- [x] `src/components/PhotoLightbox.tsx`: full-screen MUI `Dialog` with an
+      Embla carousel inside - swipe, ← → keys, or side arrows to move
+      between photos; caption + "3 / 12" counter; close via Esc, ✕ or back
+      gesture. Videos are excluded (they keep playing inline in their card).
+- [x] `GalleryItemCard` gained an optional `onPhotoClick` prop; when set the
+      photo is wrapped in a `CardActionArea` with a `zoom-in` cursor.
+      Without it (other `/manage` pages) nothing changes.
+- [x] Wired into: public `/gallery` (new `GalleryGrid` client component),
+      the home page and event detail carousels (`GalleryCarousel`), and
+      `/manage/gallery` (new `GalleryLightbox.tsx`: a context provider +
+      `ZoomableGalleryItemCard`, so the Server Component page keeps its own
+      grid with event labels and Editar/Eliminar buttons). On the manage
+      page the viewer only navigates the photos in the current filter.
+- [x] Fixed: GraphQL results passed straight into the new `GalleryGrid`
+      threw "Only plain objects ... can be passed to Client Components"
+      (same graphql-js null-prototype issue as before) - rebuilt as plain
+      object literals in `src/app/gallery/page.tsx`.
+- [x] Fixed: the lightbox's prev/next arrows jumped down on hover/click.
+      The theme's `MuiIconButton` hover override (`transform: scale(1.08)`
+      in `src/theme.ts`) replaces the button's `translateY(-50%)`
+      centering. The arrows' own `&:hover` now sets
+      `translateY(-50%) scale(1.08)`, the same fix `GalleryCarousel`
+      already used. Any future absolutely-positioned `IconButton` that
+      uses `transform` needs the same treatment.
+- Verified in headless Chromium: the public gallery lightbox opens, and
+  the arrow stays centered after hover/click (stays at y≈380; before the
+  fix it dropped to y=398). `/manage/gallery` only checked with `tsc`/`eslint` - the
+  headless login failed because the seed admin credentials in
+  `.env.local` no longer match the account's current password.
+- Headless browser note: the cached Playwright Chromium needs `libnspr4`,
+  `libnss3` and `libasound2`, which aren't installed in this WSL setup.
+  Working without sudo: `apt-get download` the three packages,
+  `dpkg-deb -x` them into a scratch dir, and run with `LD_LIBRARY_PATH`
+  pointing at its `usr/lib/x86_64-linux-gnu`.
+
+## "Voltar" (back) button
+
+- [x] `src/components/BackButton.tsx`: a plain link (`← Voltar`) to the
+      **parent page**, not browser history - per explicit request: from
+      `/manage/aaa` it always goes to `/manage`. Consequence: list filters
+      (e.g. `/manage/gallery?year=2025`) aren't preserved when coming back.
+- [x] Shown on: `/events/[id]` (-> `/events`); every `/manage/<section>`
+      list page and `/manage/historial` (-> `/manage`); event and gallery
+      new/edit pages (-> their list); `/manage/home-sections/[id]`
+      (-> `/manage/home-sections`); `.../add-photo` (-> that section).
+- [x] Deliberately not shown on: `/manage` itself (it's the hub) and the
+      `/delete` confirmation pages (per explicit request; they already
+      have a "Cancelar" button).
+- Verified in headless Chromium on an event detail page: button renders
+  above the title and navigates to `/events`. Manage pages checked with
+  `tsc`/`eslint` only (login needed).
+
+## Backlog: improvement ideas (free-tier aware)
+
+From a functionality review. Ordered roughly by value; constraints of the
+Vercel Hobby + Supabase free plans are noted where they matter.
+
+- [ ] Verify the keep-warm cron actually runs: Vercel Hobby only allows
+      cron jobs once per day, and recent commits schedule it several times
+      a day (the deploy may be rejected or runs skipped). If so, switch to
+      a free external pinger (cron-job.org / UptimeRobot) hitting the
+      home page.
+- [ ] Gallery pagination / lazy loading (`/gallery` currently fetches and
+      renders every item) - also saves Supabase egress.
+- [ ] Upload photos one request at a time so big batches don't hit
+      Vercel's 4.5MB request body limit.
+- [ ] Events: "Próximos" (upcoming) section at the top of `/events`,
+      archive by year below.
+- [ ] Per-page/per-event metadata + Open Graph image (event poster),
+      `sitemap.ts` and `robots.ts` - better Facebook/WhatsApp link
+      previews and search visibility.
+- [ ] Event detail: "Add to calendar" (.ics), Google Maps link from
+      `location`, share button (WhatsApp).
+- [ ] Account management (Phase 8 above) - currently changing a password
+      means editing the DB by hand.
+- [ ] Login rate limiting (no Redis in the stack: small Supabase table or
+      Upstash free tier).
+- [ ] Optional booking-request form on Contacts, emailed via Resend free
+      tier (3,000/month) - or just make WhatsApp/phone more prominent.
+- [ ] Draft/hidden state for events and gallery items.
+- [ ] Filter events by year/type in the GraphQL query instead of in JS.
+- [ ] Analytics: Vercel Web Analytics (free on Hobby) or GoatCounter.
+- [ ] Meaningful `alt` text for event posters (currently `alt=""`).
+
 ## Open Question (blocking Phase 8 decision)
 
 - [ ] Confirm: are all admin accounts fully equal, or should one be a "primary" owner

@@ -5,6 +5,7 @@ import Stack from "@mui/material/Stack";
 import { executeGraphQL } from "@/lib/graphql-server";
 import { HOME_SECTION_QUERY, GALLERY_ITEMS_FOR_PICKER_QUERY } from "@/lib/queries/homeSections";
 import { PageContainer } from "@/components/PageContainer";
+import { BackButton } from "@/components/BackButton";
 import { GalleryItemCard } from "@/components/GalleryItemCard";
 import { SubmitButton } from "@/components/SubmitButton";
 import { featureHomeSectionPhotoAction } from "../../actions";
@@ -41,6 +42,7 @@ export default async function AddHomeSectionPhotoPage({
 
   return (
     <PageContainer maxWidth="md">
+      <BackButton href={`/manage/home-sections/${id}`} />
       <Typography variant="h4" component="h1">
         Adicionar Foto à Secção &quot;{sectionData.homeSection.title}&quot;
       </Typography>

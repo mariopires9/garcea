@@ -8,6 +8,7 @@ import EventIcon from "@mui/icons-material/Event";
 import { executeGraphQL } from "@/lib/graphql-server";
 import { EVENTS_QUERY } from "@/lib/queries/events";
 import { PageContainer } from "@/components/PageContainer";
+import { BackButton } from "@/components/BackButton";
 import { PageTitle } from "@/components/PageTitle";
 import { FlashMessage } from "@/components/FlashMessage";
 import { isPdfUrl } from "@/lib/supabase-storage";
@@ -34,6 +35,7 @@ export default async function ManageEventsPage({
 
   return (
     <PageContainer maxWidth="md">
+      <BackButton href="/manage" />
       <FlashMessage message={success} />
       <Box
         sx={{

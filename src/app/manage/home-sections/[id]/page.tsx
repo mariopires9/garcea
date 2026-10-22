@@ -6,6 +6,7 @@ import Stack from "@mui/material/Stack";
 import { executeGraphQL } from "@/lib/graphql-server";
 import { HOME_SECTION_QUERY } from "@/lib/queries/homeSections";
 import { PageContainer } from "@/components/PageContainer";
+import { BackButton } from "@/components/BackButton";
 import { HomeSectionForm } from "@/components/HomeSectionForm";
 import { GalleryItemCard } from "@/components/GalleryItemCard";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -40,6 +41,7 @@ export default async function EditHomeSectionPage({
 
   return (
     <PageContainer maxWidth="md">
+      <BackButton href="/manage/home-sections" />
       <Typography variant="h4" component="h1">
         Editar Secção
       </Typography>
