@@ -847,7 +847,7 @@ Vercel Hobby + Supabase free plans are noted where they matter.
       docs (checked 2026-10-22) Hobby allows up to 100 cron jobs per
       project, each running at most once per day, with ±59 min timing
       precision. `vercel.json` has two separate daily jobs (06:00 and
-      12:00 UTC; was 18:00 until 2026-10-22), so it's within limits - the earlier worry here was based
+      15:00 UTC; was 18:00 until 2026-10-22), so it's within limits - the earlier worry here was based
       on outdated limits. `/` is dynamic (`ƒ` in the build output) and
       queries the DB, so each run counts as database activity; production
       `https://garcea.vercel.app/` answers 200 to a `vercel-cron/1.0`
