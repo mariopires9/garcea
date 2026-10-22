@@ -1,4 +1,5 @@
 {
+  "regions": ["lhr1"],
   "crons": [
     {
       "path": "/",
@@ -6,7 +7,7 @@
     },
     {
       "path": "/",
-      "schedule": "0 15 * * *"
+      "schedule": "0 18 * * *"
     }
   ]
 }

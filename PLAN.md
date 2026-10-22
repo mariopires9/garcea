@@ -99,7 +99,7 @@ should drive design decisions:
 | Supabase database | 500MB, pauses after ~1 week idle | Keep-warm ping on the home page |
 | Vercel function request body | 4.5MB (ignores `bodySizeLimit`) | Large multi-photo uploads must be split into several requests |
 | Vercel image optimization | Limited quota | Don't route gallery photos through `next/image`; Supabase image transforms are Pro-only |
-| Vercel cron | Up to 100 jobs, each at most once per day, ±59 min timing | Keep-warm uses two daily jobs (06:00/15:00 UTC); for anything more frequent, use an external free pinger |
+| Vercel cron | Up to 100 jobs, each at most once per day, ±59 min timing | Keep-warm uses two daily jobs (06:00/18:00 UTC); for anything more frequent, use an external free pinger |
 | Vercel Hobby terms | Non-commercial use only | Fine for the association; no selling or ads on the site |
 
 Open backlog items are tracked in [TASKS.md](./TASKS.md) under

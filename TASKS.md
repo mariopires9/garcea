@@ -847,15 +847,27 @@ Vercel Hobby + Supabase free plans are noted where they matter.
       docs (checked 2026-10-22) Hobby allows up to 100 cron jobs per
       project, each running at most once per day, with ±59 min timing
       precision. `vercel.json` has two separate daily jobs (06:00 and
-      15:00 UTC; was 18:00 until 2026-10-22), so it's within limits - the earlier worry here was based
+      18:00 UTC), so it's within limits - the earlier worry here was based
       on outdated limits. `/` is dynamic (`ƒ` in the build output) and
       queries the DB, so each run counts as database activity; production
       `https://garcea.vercel.app/` answers 200 to a `vercel-cron/1.0`
       user agent.
-- [ ] Confirm the cron runs in production: Vercel dashboard -> project
-      -> Settings -> Cron Jobs -> "View Logs" should show a request to `/`
-      roughly every 12h. Needs the user's Vercel login (the Vercel CLI
-      isn't installed/logged in here).
+- [x] Confirm the cron runs in production: on 2026-10-22 the second job
+      was moved to `0 15 * * *` (16:00 Lisbon) so the run could
+      be caught in Hobby's ~1h log retention. Vercel's request logs showed
+      a single `GET /` -> 200 at 16:14:45 Lisbon, received directly in
+      `iad1` with a bare `Mozilla/5.0 (compatible)` user agent, 2.23s
+      function invocation, 0 errors - matching the cron window. A real
+      visit from Portugal right after came in via the Paris edge (`cdg1`)
+      with a full browser user agent, so the 16:14 request was the cron.
+      Schedule then restored to 06:00/18:00 UTC. For future checks, the
+      Cron Jobs page's "View Logs" button gives a filtered view.
+- [x] Run functions in London (`"regions": ["lhr1"]` in `vercel.json`):
+      the logs showed functions running in Vercel's default `iad1`
+      (Washington) while the Supabase DB is in `eu-west-2` (London), so
+      every DB query crossed the Atlantic (~2s for `/`). Hobby allows one
+      region of your choice. Check the next request logs for the new
+      region and execution time.
 - [ ] Gallery pagination / lazy loading (`/gallery` currently fetches and
       renders every item) - also saves Supabase egress.
 - [ ] Upload photos one request at a time so big batches don't hit
