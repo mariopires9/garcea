@@ -8,6 +8,12 @@ import { PageContainer } from "@/components/PageContainer";
 import { FormCard } from "@/components/FormCard";
 import { SubmitButton } from "@/components/SubmitButton";
 import { authenticate } from "./actions";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Entrar",
+  robots: { index: false, follow: false },
+};
 
 export default async function LoginPage({
   searchParams,

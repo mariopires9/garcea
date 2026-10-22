@@ -9,6 +9,8 @@ import { PageTitle } from "@/components/PageTitle";
 import { executeGraphQL } from "@/lib/graphql-server";
 import { OFFICIAL_CONTACTS_QUERY } from "@/lib/queries/officialContacts";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 
 type OfficialContactsData = {
   officialContacts: {
@@ -18,6 +20,13 @@ type OfficialContactsData = {
     value: string;
   }[];
 };
+
+export const metadata: Metadata = pageMetadata({
+  title: "Contactos",
+  description:
+    "Gostaria de ver o Rancho Folclórico das Lavradeiras de Gondar no seu evento? Contacte a Associação GARCEA.",
+  path: "/contacts",
+});
 
 export default async function ContactsPage() {
   const contactsData =

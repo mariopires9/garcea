@@ -1,3 +1,5 @@
+import { cache } from "react";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -13,6 +15,7 @@ import { BackButton } from "@/components/BackButton";
 import { PageTitle } from "@/components/PageTitle";
 import { isPdfUrl } from "@/lib/supabase-storage";
 import { EVENT_TYPE_LABELS } from "@/lib/eventTypes";
+import { pageMetadata, toMetaDescription } from "@/lib/site";
 
 type EventData = {
   event: {
@@ -34,13 +37,35 @@ type EventData = {
   } | null;
 };
 
+// Shared by generateMetadata and the page so the event is fetched once per request.
+const getEvent = cache((id: string) => executeGraphQL<EventData>(EVENT_QUERY, { id }));
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const { event } = await getEvent(id);
+  if (!event) return {};
+
+  const date = new Date(event.date).toLocaleDateString("pt-PT");
+  return pageMetadata({
+    title: event.title,
+    description: toMetaDescription(`${date} · ${event.location}. ${event.description}`),
+    path: `/events/${event.id}`,
+    // PDF posters can't be used as a link preview image; fall back to the logo.
+    image: event.posterUrl && !isPdfUrl(event.posterUrl) ? event.posterUrl : null,
+  });
+}
+
 export default async function EventDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const data = await executeGraphQL<EventData>(EVENT_QUERY, { id });
+  const data = await getEvent(id);
 
   if (!data.event) notFound();
 

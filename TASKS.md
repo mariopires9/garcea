@@ -843,20 +843,28 @@ Derived from [PLAN.md](./PLAN.md). Check items off as they're completed.
 From a functionality review. Ordered roughly by value; constraints of the
 Vercel Hobby + Supabase free plans are noted where they matter.
 
-- [ ] Verify the keep-warm cron actually runs: Vercel Hobby only allows
-      cron jobs once per day, and recent commits schedule it several times
-      a day (the deploy may be rejected or runs skipped). If so, switch to
-      a free external pinger (cron-job.org / UptimeRobot) hitting the
-      home page.
+- [x] Verify the keep-warm cron config is valid on Hobby: per Vercel's
+      docs (checked 2026-10-22) Hobby allows up to 100 cron jobs per
+      project, each running at most once per day, with ±59 min timing
+      precision. `vercel.json` has two separate daily jobs (06:00 and
+      18:00 UTC), so it's within limits - the earlier worry here was based
+      on outdated limits. `/` is dynamic (`ƒ` in the build output) and
+      queries the DB, so each run counts as database activity; production
+      `https://garcea.vercel.app/` answers 200 to a `vercel-cron/1.0`
+      user agent.
+- [ ] Confirm the cron runs in production: Vercel dashboard -> project
+      -> Settings -> Cron Jobs -> "View Logs" should show a request to `/`
+      roughly every 12h. Needs the user's Vercel login (the Vercel CLI
+      isn't installed/logged in here).
 - [ ] Gallery pagination / lazy loading (`/gallery` currently fetches and
       renders every item) - also saves Supabase egress.
 - [ ] Upload photos one request at a time so big batches don't hit
       Vercel's 4.5MB request body limit.
 - [ ] Events: "Próximos" (upcoming) section at the top of `/events`,
       archive by year below.
-- [ ] Per-page/per-event metadata + Open Graph image (event poster),
+- [x] Per-page/per-event metadata + Open Graph image (event poster),
       `sitemap.ts` and `robots.ts` - better Facebook/WhatsApp link
-      previews and search visibility.
+      previews and search visibility. See "SEO + link previews" below.
 - [ ] Event detail: "Add to calendar" (.ics), Google Maps link from
       `location`, share button (WhatsApp).
 - [ ] Account management (Phase 8 above) - currently changing a password
@@ -869,6 +877,45 @@ Vercel Hobby + Supabase free plans are noted where they matter.
 - [ ] Filter events by year/type in the GraphQL query instead of in JS.
 - [ ] Analytics: Vercel Web Analytics (free on Hobby) or GoatCounter.
 - [ ] Meaningful `alt` text for event posters (currently `alt=""`).
+
+## SEO + link previews (metadata, Open Graph, sitemap, robots)
+
+- [x] `src/lib/site.ts`: `SITE_URL` (`NEXT_PUBLIC_SITE_URL`, else Vercel's
+      auto-set `VERCEL_PROJECT_PRODUCTION_URL`, else localhost) and a
+      `pageMetadata()` helper. Next.js merges metadata **shallowly**, so a
+      page setting `openGraph` replaces the layout's whole `openGraph`
+      object - the helper always rebuilds it in full (site name, `pt_PT`
+      locale, default image = `/logo.png`).
+- [x] Root layout: `metadataBase`, title template `%s | Associação GARCEA`.
+      It deliberately sets no canonical URL - one set in a layout would be
+      inherited by every page without its own, pointing them all at `/`.
+- [x] Static metadata (title, description, canonical, OG) on `/`,
+      `/events`, `/historial`, `/contacts`, `/gallery`; `/login` is
+      `noindex, nofollow`.
+- [x] `/events/[id]`: `generateMetadata` with the event title, a
+      description built from date · location + event text (trimmed to 160
+      chars) and the poster as `og:image` (`summary_large_image`). PDF
+      posters fall back to the logo. The event query is wrapped in React
+      `cache()` so metadata and page share one DB request.
+- [x] `src/app/robots.ts`: allow `/`, disallow `/manage`, `/login`, `/api`,
+      points at the sitemap. `src/app/sitemap.ts`: home, events,
+      historial, contacts + every event. Dynamic (`ƒ`, because
+      `executeGraphQL` reads the session cookie), so new events show up
+      without a redeploy. `/gallery` is left out on purpose (hidden from
+      the nav).
+- Facebook/WhatsApp: Next.js 16 streams `generateMetadata` output into
+  `<body>` for normal browsers, but for "HTML-limited" bots (its list
+  includes `facebookexternalhit` and `WhatsApp`) it blocks and puts the
+  tags in `<head>` - confirmed with a `WhatsApp/2.x` user agent.
+- Verified: `tsc`, `eslint`, `next build` clean; with a WhatsApp user agent
+  `/`, `/events`, an event page and `/login` return the expected
+  title/description/canonical/OG tags in `<head>`; `robots.txt` and
+  `sitemap.xml` render correctly. Not yet checked on production with
+  Facebook's Sharing Debugger.
+- [ ] When `associacaogarcea.pt` goes live, set `NEXT_PUBLIC_SITE_URL` on
+      Vercel (or make it the project's production domain) so canonical/OG
+      URLs and the sitemap use it, then submit the sitemap in Google
+      Search Console.
 
 ## Open Question (blocking Phase 8 decision)
 

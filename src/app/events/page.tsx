@@ -15,6 +15,8 @@ import { EventFilters } from "@/components/EventFilters";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { isPdfUrl } from "@/lib/supabase-storage";
 import { EVENT_TYPE_LABELS } from "@/lib/eventTypes";
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 
 type EventsData = {
   events: {
@@ -26,6 +28,13 @@ type EventsData = {
     type: "FOLCLORE" | "OUTROS";
   }[];
 };
+
+export const metadata: Metadata = pageMetadata({
+  title: "Eventos",
+  description:
+    "Atuações e eventos do Rancho Folclórico das Lavradeiras de Gondar, organizados por ano.",
+  path: "/events",
+});
 
 export default async function EventsPage({
   searchParams,

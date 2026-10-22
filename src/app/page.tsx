@@ -6,6 +6,8 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { HomeHero } from "@/components/HomeHero";
 import { executeGraphQL } from "@/lib/graphql-server";
 import { HOME_SECTIONS_QUERY } from "@/lib/queries/homeSections";
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 
 type HomeSectionsData = {
   homeSections: {
@@ -21,6 +23,8 @@ type HomeSectionsData = {
     }[];
   }[];
 };
+
+export const metadata: Metadata = pageMetadata({ path: "/" });
 
 export default async function Home() {
   const { homeSections } = await executeGraphQL<HomeSectionsData>(HOME_SECTIONS_QUERY);

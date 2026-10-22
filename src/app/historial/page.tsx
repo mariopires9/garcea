@@ -6,8 +6,17 @@ import { PageTitle } from "@/components/PageTitle";
 import { executeGraphQL } from "@/lib/graphql-server";
 import { HISTORIAL_SECTION_QUERY } from "@/lib/queries/historial";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 
 type HistorialSectionData = { historialSection: { description: string } | null };
+
+export const metadata: Metadata = pageMetadata({
+  title: "Historial",
+  description:
+    "A história da Associação GARCEA e do Rancho Folclórico das Lavradeiras de Gondar.",
+  path: "/historial",
+});
 
 export default async function HistorialPage() {
   const data = await executeGraphQL<HistorialSectionData>(HISTORIAL_SECTION_QUERY);

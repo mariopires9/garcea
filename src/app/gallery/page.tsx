@@ -8,6 +8,8 @@ import { GalleryGrid } from "@/components/GalleryGrid";
 import { PageContainer } from "@/components/PageContainer";
 import { PageTitle } from "@/components/PageTitle";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 
 type GalleryData = {
   galleryItems: {
@@ -19,6 +21,13 @@ type GalleryData = {
     event: { id: string; title: string } | null;
   }[];
 };
+
+export const metadata: Metadata = pageMetadata({
+  title: "Galeria",
+  description:
+    "Fotos e vídeos das atuações do Rancho Folclórico das Lavradeiras de Gondar.",
+  path: "/gallery",
+});
 
 export default async function GalleryPage() {
   const data = await executeGraphQL<GalleryData>(GALLERY_ITEMS_QUERY);

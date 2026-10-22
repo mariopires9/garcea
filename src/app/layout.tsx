@@ -6,6 +6,7 @@ import Box from "@mui/material/Box";
 import { ThemeRegistry } from "@/components/ThemeRegistry";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
+import { SITE_NAME, SITE_URL, pageMetadata } from "@/lib/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -19,8 +20,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Associação GARCEA",
-  description: "Site oficial da Associação GARCEA",
+  metadataBase: new URL(SITE_URL),
+  ...pageMetadata({}),
+  title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
