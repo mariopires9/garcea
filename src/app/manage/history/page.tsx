@@ -8,11 +8,11 @@ import { BackButton } from "@/components/BackButton";
 import { PageTitle } from "@/components/PageTitle";
 import { FormCard } from "@/components/FormCard";
 import { SubmitButton } from "@/components/SubmitButton";
-import { updateHistorialSectionAction } from "./actions";
+import { updateHistorySectionAction } from "./actions";
 
 type HistorialSectionData = { historialSection: { description: string } | null };
 
-export default async function ManageHistorialPage() {
+export default async function ManageHistoryPage() {
   const data = await executeGraphQL<HistorialSectionData>(HISTORIAL_SECTION_QUERY);
 
   return (
@@ -23,7 +23,7 @@ export default async function ManageHistorialPage() {
       </PageTitle>
 
       <FormCard>
-        <Stack component="form" action={updateHistorialSectionAction} spacing={2}>
+        <Stack component="form" action={updateHistorySectionAction} spacing={2}>
           <TextField
             label="Descrição"
             name="description"

@@ -28,7 +28,7 @@ export function HomeHero() {
             Ver Eventos
           </Button>
           <Button
-            href="/historial"
+            href="/history"
             variant="outlined"
             size="large"
             sx={{

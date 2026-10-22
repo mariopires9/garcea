@@ -36,7 +36,7 @@ const links: {
     color: "secondary",
   },
   {
-    href: "/manage/historial",
+    href: "/manage/history",
     label: "Gerir Historial",
     icon: <AutoStoriesIcon />,
     color: "secondary",

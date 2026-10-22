@@ -15,10 +15,10 @@ export const metadata: Metadata = pageMetadata({
   title: "Historial",
   description:
     "A história da Associação GARCEA e do Rancho Folclórico das Lavradeiras de Gondar.",
-  path: "/historial",
+  path: "/history",
 });
 
-export default async function HistorialPage() {
+export default async function HistoryPage() {
   const data = await executeGraphQL<HistorialSectionData>(HISTORIAL_SECTION_QUERY);
 
   return (

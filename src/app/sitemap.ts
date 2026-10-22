@@ -7,7 +7,7 @@ type EventsData = { events: { id: string; title: string; date: string }[] };
 
 // /gallery is left out on purpose: it was removed from the nav and is only
 // reachable by direct link.
-const STATIC_PATHS = ["/", "/events", "/historial", "/contacts"];
+const STATIC_PATHS = ["/", "/events", "/history", "/contacts"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { events } = await executeGraphQL<EventsData>(EVENT_OPTIONS_QUERY);

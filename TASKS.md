@@ -334,7 +334,7 @@ Derived from [PLAN.md](./PLAN.md). Check items off as they're completed.
   their empty states.
 - While testing, found that curl-replicated calls to *any* Server Action
   that ends in `redirect()` (not just this feature's - reproduced the same
-  way against the pre-existing `updateHistorialSectionAction`) currently
+  way against the pre-existing `updateHistorySectionAction`) currently
   fail with a deterministic `Error: Connection closed.` on this dev
   server, matching the same pre-existing, unrelated issue already noted
   above for `authenticate`. Worked around it by exercising the same
@@ -872,6 +872,26 @@ Derived from [PLAN.md](./PLAN.md). Check items off as they're completed.
   (`encode` from `@auth/core/jwt`, salt `authjs.session-token`) for a
   fake user id, set it as the `authjs.session-token` cookie, and delete
   the token file afterwards. Read-only use only - it hits the real DB.
+
+## Rename /historial to /history (English route names)
+
+- [x] `src/app/historial` -> `src/app/history` and `src/app/manage/historial`
+      -> `src/app/manage/history` (moved with `git mv`), matching
+      `/events`, `/contacts`, `/gallery`. Links updated in `Nav.tsx`,
+      `HomeHero.tsx`, the `/manage` hub, the Server Action's
+      `revalidatePath`/`redirect`, page metadata and `sitemap.ts`. The
+      visible label stays "Historial"; the DB model/queries keep the
+      `HistorialSection` name. Older sections of this file still say
+      `/historial` - that was the route at the time.
+- [x] Permanent (308) redirects in `next.config.ts`: `/historial` ->
+      `/history` and `/manage/historial` -> `/manage/history`, so shared
+      links and search results for the old URLs keep working.
+- Gotcha: after renaming route folders, `tsc --noEmit` fails on stale
+  `.next/types/validator.ts` entries pointing at the old paths until
+  `next build` (or `next dev`) regenerates them.
+- Verified on the dev server: `/history` 200 with canonical `/history`;
+  both old URLs 308 to the new ones; home page links point at
+  `/history`; sitemap lists `/history`; `next build` clean.
 
 ## Backlog: improvement ideas (free-tier aware)
 

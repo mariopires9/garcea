@@ -12,7 +12,7 @@ import { ColorModeToggle } from "@/components/ColorModeToggle";
 
 const links = [
   { href: "/", label: "Início" },
-  { href: "/historial", label: "Historial" },
+  { href: "/history", label: "Historial" },
   { href: "/events", label: "Eventos" },
   { href: "/contacts", label: "Contactos" },
 ];
