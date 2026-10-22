@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { deletePhoto } from "@/lib/supabase-storage";
 import { requireUserId, type GraphQLContext } from "./context";
+import { accountMutations, accountQueries, userFieldResolvers } from "./accounts";
 
 type EventInput = {
   title: string;
@@ -78,9 +79,11 @@ export const resolvers = {
     officialContacts: () =>
       prisma.officialContact.findMany({ orderBy: { createdAt: "asc" } }),
     socialLinks: () => prisma.socialLink.findMany({ orderBy: { order: "asc" } }),
+    ...accountQueries,
   },
 
   Mutation: {
+    ...accountMutations,
     createEvent: (
       _: unknown,
       args: { input: EventInput },
@@ -388,4 +391,6 @@ export const resolvers = {
   SocialLink: {
     createdAt: (parent: { createdAt: Date }) => toISOString(parent.createdAt),
   },
+
+  User: userFieldResolvers,
 };

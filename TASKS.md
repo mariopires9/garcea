@@ -115,10 +115,12 @@ Derived from [PLAN.md](./PLAN.md). Check items off as they're completed.
 
 ## Phase 8 — Account management
 
-- [ ] Manage: page listing all admin accounts
-- [ ] Manage: edit account (name, email, password change)
-- [ ] Manage: add new admin account
-- [ ] Manage: remove admin account (with confirmation, prevent removing the last remaining account)
+- [x] Manage: page listing all admin accounts
+- [x] Manage: edit account (name, email, password change)
+- [x] Manage: add new admin account
+- [x] Manage: remove admin account (with confirmation; the owner account can
+      never be removed, so the last account can't be removed either)
+- See "Account management with a protected owner" below for the details.
 
 ## Phase 9 — Polish & deploy
 
@@ -893,6 +895,60 @@ Derived from [PLAN.md](./PLAN.md). Check items off as they're completed.
   `/history`; `next build` clean. Page/action functions renamed to match
   (`HistoryPage`, `ManageHistoryPage`, `updateHistorySectionAction`).
 
+## Account management with a protected owner
+
+- Permission model (decided with the user):
+  | | Owner | Other admins |
+  |---|---|---|
+  | See the account list | yes | yes |
+  | Add / remove accounts | yes (owner can't be removed) | no |
+  | Change own name/email | yes | yes |
+  | Change own password | yes, current password required | yes, current password required |
+  | Change another account's name/email/password | yes, no current password needed | no |
+- [x] `User.isOwner Boolean @default(false)`; migration
+      `20261022170000_add_user_owner` adds the column and marks the
+      **oldest** account as owner (chosen by `createdAt`, so no email is in
+      the repo). Applied to the (shared dev/prod) Supabase DB on
+      2026-10-22: Mario = owner, garcea = admin.
+- [x] GraphQL (`src/graphql/accounts.ts`): queries `users`, `user(id)`,
+      `me`; mutations `createUser`, `updateUser`, `changePassword`,
+      `deleteUser`. All rules are enforced there, server-side; the pages
+      only hide what isn't allowed. The current user is re-read from the
+      DB on each check, so a removed account's leftover session can't use
+      them. Passwords: min 8 chars, bcrypt cost 12 (same as the seed).
+      Emails are saved trimmed + lowercased, and login now looks them up
+      the same way (`src/auth.ts`).
+- [x] Removing an account moves its events and gallery items to the owner
+      in the same transaction (both require an author) instead of
+      deleting the content.
+- [x] Security fix found along the way: `User.email` was readable by
+      anyone through the public GraphQL endpoint (e.g.
+      `events { createdBy { email } }`). The field now requires a logged-in
+      admin; `createdBy { name }` stays public.
+- [x] Pages: `/manage/accounts` (list with "Proprietário"/"Você" chips,
+      "Adicionar Conta" only for the owner), `/manage/accounts/new`
+      (owner only, else redirected to the list), `/manage/accounts/[id]/edit`
+      ("Dados da conta" + "Alterar palavra-passe"; the current-password
+      field only appears on your own account), `/manage/accounts/[id]/delete`
+      (owner only, never for the owner account). "Gerir Contas" card on
+      `/manage`.
+- Verified: 20/20 API permission checks against the dev server with
+  locally signed sessions for both real accounts (every forbidden action
+  refused with its Portuguese message; validation for short password,
+  bad email, duplicate email). Allowed actions were exercised on a
+  temporary account that was created, edited, given a new password and
+  deleted - real accounts and passwords were not touched. Pages checked
+  in headless Chromium as owner and as admin.
+- Gotcha: after `prisma generate` the running `next dev` keeps the old
+  Prisma client in memory (`globalThis.prisma`), so new columns come back
+  `null` ("Cannot return null for non-nullable field User.isOwner") until
+  the dev server is restarted.
+- Known, pre-existing: `notFound()` pages under `/manage` return HTTP 200
+  (the root `loading.tsx` starts streaming first) while showing "Página
+  não encontrada" - same as every other manage page.
+- Not done: a changed name/email shows on `/manage` ("Sessão iniciada
+  como …") only after logging in again, because it's read from the JWT.
+
 ## Backlog: improvement ideas (free-tier aware)
 
 From a functionality review. Ordered roughly by value; constraints of the
@@ -944,8 +1000,8 @@ Vercel Hobby + Supabase free plans are noted where they matter.
       previews and search visibility. See "SEO + link previews" below.
 - [ ] Event detail: "Add to calendar" (.ics), Google Maps link from
       `location`, share button (WhatsApp).
-- [ ] Account management (Phase 8 above) - currently changing a password
-      means editing the DB by hand.
+- [x] Account management (Phase 8 above) - see "Account management with a
+      protected owner".
 - [ ] Login rate limiting (no Redis in the stack: small Supabase table or
       Upstash free tier).
 - [ ] Optional booking-request form on Contacts, emailed via Resend free
@@ -996,5 +1052,7 @@ Vercel Hobby + Supabase free plans are noted where they matter.
 
 ## Open Question (blocking Phase 8 decision)
 
-- [ ] Confirm: are all admin accounts fully equal, or should one be a "primary" owner
-      that can't be removed by the other?
+- [x] Confirm: are all admin accounts fully equal, or should one be a "primary" owner
+      that can't be removed by the other? Decided 2026-10-22: one protected
+      owner (the first account, Mario) - see "Account management with a
+      protected owner".

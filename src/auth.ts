@@ -19,7 +19,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           typeof credentials?.password === "string" ? credentials.password : undefined;
         if (!email || !password) return null;
 
-        const user = await prisma.user.findUnique({ where: { email } });
+        // Accounts are saved with trimmed, lowercased emails (see graphql/accounts.ts).
+        const user = await prisma.user.findUnique({
+          where: { email: email.trim().toLowerCase() },
+        });
         if (!user) return null;
 
         const isValid = await bcrypt.compare(password, user.passwordHash);

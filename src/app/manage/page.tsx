@@ -10,6 +10,7 @@ import ViewAgendaIcon from "@mui/icons-material/ViewAgenda";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
 import ShareIcon from "@mui/icons-material/Share";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import type { ReactNode } from "react";
 import { PageContainer } from "@/components/PageContainer";
 import { PageTitle } from "@/components/PageTitle";
@@ -52,6 +53,12 @@ const links: {
     label: "Gerir Redes Sociais",
     icon: <ShareIcon />,
     color: "secondary",
+  },
+  {
+    href: "/manage/accounts",
+    label: "Gerir Contas",
+    icon: <ManageAccountsIcon />,
+    color: "primary",
   },
 ];
 

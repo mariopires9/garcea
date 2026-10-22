@@ -33,7 +33,10 @@ export const typeDefs = /* GraphQL */ `
   type User {
     id: ID!
     name: String!
+    "Only returned to logged-in admins."
     email: String!
+    isOwner: Boolean!
+    createdAt: String!
   }
 
   type Event {
@@ -129,6 +132,17 @@ export const typeDefs = /* GraphQL */ `
     url: String!
   }
 
+  input UserInput {
+    name: String!
+    email: String!
+  }
+
+  input CreateUserInput {
+    name: String!
+    email: String!
+    password: String!
+  }
+
   type Query {
     events: [Event!]!
     event(id: ID!): Event
@@ -139,6 +153,9 @@ export const typeDefs = /* GraphQL */ `
     historialSection: HistorialSection
     officialContacts: [OfficialContact!]!
     socialLinks: [SocialLink!]!
+    users: [User!]!
+    user(id: ID!): User
+    me: User!
   }
 
   type Mutation {
@@ -166,5 +183,10 @@ export const typeDefs = /* GraphQL */ `
     createSocialLink(input: SocialLinkInput!): SocialLink!
     deleteSocialLink(id: ID!): Boolean!
     moveSocialLink(id: ID!, direction: MoveDirection!): Boolean!
+
+    createUser(input: CreateUserInput!): User!
+    updateUser(id: ID!, input: UserInput!): User!
+    changePassword(id: ID!, currentPassword: String, newPassword: String!): Boolean!
+    deleteUser(id: ID!): Boolean!
   }
 `;
