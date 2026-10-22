@@ -883,15 +883,15 @@ Derived from [PLAN.md](./PLAN.md). Check items off as they're completed.
       visible label stays "Historial"; the DB model/queries keep the
       `HistorialSection` name. Older sections of this file still say
       `/historial` - that was the route at the time.
-- [x] Permanent (308) redirects in `next.config.ts`: `/historial` ->
-      `/history` and `/manage/historial` -> `/manage/history`, so shared
-      links and search results for the old URLs keep working.
+- No redirects from the old URLs, by explicit choice: `/historial` and
+  `/manage/historial` now return 404.
 - Gotcha: after renaming route folders, `tsc --noEmit` fails on stale
   `.next/types/validator.ts` entries pointing at the old paths until
   `next build` (or `next dev`) regenerates them.
 - Verified on the dev server: `/history` 200 with canonical `/history`;
-  both old URLs 308 to the new ones; home page links point at
-  `/history`; sitemap lists `/history`; `next build` clean.
+  `/historial` 404; home page links point at `/history`; sitemap lists
+  `/history`; `next build` clean. Page/action functions renamed to match
+  (`HistoryPage`, `ManageHistoryPage`, `updateHistorySectionAction`).
 
 ## Backlog: improvement ideas (free-tier aware)
 
