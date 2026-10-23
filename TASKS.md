@@ -1124,6 +1124,32 @@ and the sitemap) and was only reachable by typing the address.
   page shows with no connection, the iPhone steps dialog opens from the
   menu, and no button is shown in the installed app.
 
+## Database connections: transaction pooler
+
+Problem (found 2026-10-23 while testing): `DATABASE_URL` used Supabase's
+session pooler (port 5432), which allows 15 clients in total, shared by
+production, local dev, builds and migrations. Each server's `pg` pool can
+open up to 10 connections, pages ran one query per item in parallel, and
+paused Vercel functions keep idle connections open, so the slots ran out:
+"(EMAXCONNSESSION) max clients reached in session mode" and failed pages.
+
+- [x] `DATABASE_URL` now points at the transaction pooler (port 6543) on
+      Vercel and in `.env.local` (done by Mario). A connection only holds a
+      slot while a query runs. Safe with `@prisma/adapter-pg`: it doesn't
+      use named prepared statements unless `statementNameGenerator` is set.
+- [x] `DIRECT_URL` (same address, port 5432) for the Prisma CLI only:
+      `prisma7.config.ts` uses it when set, because migrations need a
+      session connection. Local only, not needed on Vercel.
+- [x] `src/lib/prisma.ts`: at most 5 connections per server instance.
+- [x] Fewer parallel queries: `galleryItems` loads each item's event and
+      `homeSections` loads the featured photos in the same request, instead
+      of one query per item/section (`GalleryItem.event` and
+      `HomeSection.featuredPhotos` reuse what was loaded).
+- Verified locally: `prisma migrate status` goes through port 5432; 27
+  parallel public page requests and 20 parallel `/manage/gallery?limit=48`
+  requests all returned 200 with no connection errors; gallery cards still
+  show their event and the home page its photos.
+
 ## Backlog: improvement ideas (free-tier aware)
 
 From a functionality review. Ordered roughly by value; constraints of the
@@ -1185,13 +1211,7 @@ Vercel Hobby + Supabase free plans are noted where they matter.
       `location`. (Share button done - see "Share button on event pages".)
 - [x] Account management (Phase 8 above) - see "Account management with a
       protected owner".
-- [ ] Database connections: `DATABASE_URL` uses Supabase's session pooler
-      (port 5432), limited to 15 clients shared by production, local dev
-      and builds; each Prisma/`pg` pool can open up to 10. While testing on
-      2026-10-23, two local servers hit "EMAXCONNSESSION max clients
-      reached" and pages failed. For Vercel (serverless) switch to the
-      transaction pooler (port 6543) and/or cap the pool (`max`) in
-      `src/lib/prisma.ts`.
+- [x] Database connections - see "Database connections: transaction pooler".
 - [ ] Login rate limiting (no Redis in the stack: small Supabase table or
       Upstash free tier).
 - [ ] Optional booking-request form on Contacts, emailed via Resend free

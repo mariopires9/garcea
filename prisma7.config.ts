@@ -12,6 +12,9 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // CLI only (migrate, db, studio). Migrations need a session connection,
+    // which the transaction pooler the app uses (port 6543) doesn't provide,
+    // so use DIRECT_URL (session pooler, port 5432) when it's set.
+    url: process.env["DIRECT_URL"] || process.env["DATABASE_URL"],
   },
 });

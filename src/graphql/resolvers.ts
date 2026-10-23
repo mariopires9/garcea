@@ -65,6 +65,13 @@ function galleryItemsWhere(args: GalleryItemsFilter) {
   };
 }
 
+const FEATURED_PHOTOS_INCLUDE = {
+  featuredPhotos: {
+    orderBy: { createdAt: "asc" as const },
+    include: { galleryItem: true },
+  },
+};
+
 export const resolvers = {
   Query: {
     events: () => prisma.event.findMany({ orderBy: { date: "desc" } }),
@@ -78,12 +85,19 @@ export const resolvers = {
         where: galleryItemsWhere(args),
         orderBy: { createdAt: "desc" },
         ...(args.limit ? { take: Math.max(1, args.limit) } : {}),
+        // Loaded here so GalleryItem.event doesn't run one query per item.
+        include: { event: true },
       }),
     galleryItemsCount: (_: unknown, args: GalleryItemsFilter) =>
       prisma.galleryItem.count({ where: galleryItemsWhere(args) }),
     galleryItem: (_: unknown, args: { id: string }) =>
       prisma.galleryItem.findUnique({ where: { id: args.id } }),
-    homeSections: () => prisma.homeSection.findMany({ orderBy: { order: "asc" } }),
+    homeSections: () =>
+      prisma.homeSection.findMany({
+        orderBy: { order: "asc" },
+        // Loaded here so HomeSection.featuredPhotos doesn't run one query per section.
+        include: FEATURED_PHOTOS_INCLUDE,
+      }),
     homeSection: (_: unknown, args: { id: string }) =>
       prisma.homeSection.findUnique({ where: { id: args.id } }),
     historialSection: () =>
@@ -388,8 +402,10 @@ export const resolvers = {
 
   GalleryItem: {
     createdAt: (parent: { createdAt: Date }) => toISOString(parent.createdAt),
-    event: (parent: { eventId: string | null }) =>
-      parent.eventId ? prisma.event.findUnique({ where: { id: parent.eventId } }) : null,
+    event: (parent: { eventId: string | null; event?: unknown }) => {
+      if (parent.event !== undefined) return parent.event;
+      return parent.eventId ? prisma.event.findUnique({ where: { id: parent.eventId } }) : null;
+    },
     uploadedBy: (parent: { uploadedById: string }) =>
       prisma.user.findUniqueOrThrow({ where: { id: parent.uploadedById } }),
   },
@@ -397,12 +413,16 @@ export const resolvers = {
   HomeSection: {
     createdAt: (parent: { createdAt: Date }) => toISOString(parent.createdAt),
     updatedAt: (parent: { updatedAt: Date }) => toISOString(parent.updatedAt),
-    featuredPhotos: async (parent: { id: string }) => {
-      const featured = await prisma.homeSectionFeaturedPhoto.findMany({
-        where: { homeSectionId: parent.id },
-        orderBy: { createdAt: "asc" },
-        include: { galleryItem: true },
-      });
+    featuredPhotos: async (parent: {
+      id: string;
+      featuredPhotos?: { galleryItem: unknown }[];
+    }) => {
+      const featured =
+        parent.featuredPhotos ??
+        (await prisma.homeSectionFeaturedPhoto.findMany({
+          where: { homeSectionId: parent.id },
+          ...FEATURED_PHOTOS_INCLUDE.featuredPhotos,
+        }));
       return featured.map((f) => f.galleryItem);
     },
   },
