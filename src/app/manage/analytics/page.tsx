@@ -230,10 +230,6 @@ export default async function ManageAnalyticsPage({
 
       {result.status === "ok" && (
         <>
-          <Typography color="text.secondary">
-            Visitas ao site público nos últimos {days} dias (as páginas de gestão não contam).
-            Atualizado a cada 10 minutos.
-          </Typography>
 
           <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 2 }}>
             <StatTile label="Visitantes" value={result.summary.totals.visitors} />
