@@ -16,6 +16,7 @@ import { PageContainer } from "@/components/PageContainer";
 import { PageTitle } from "@/components/PageTitle";
 import { SubmitButton } from "@/components/SubmitButton";
 import { auth, signOut } from "@/auth";
+import { SITE_NAME } from "@/lib/config";
 
 const links: {
   href: string;
@@ -67,7 +68,7 @@ export default async function ManagePage() {
 
   return (
     <PageContainer maxWidth="sm">
-      <PageTitle icon={<AdminPanelSettingsIcon />}>Gerir Associação GARCEA</PageTitle>
+      <PageTitle icon={<AdminPanelSettingsIcon />}>Gerir {SITE_NAME}</PageTitle>
       <Typography color="text.secondary">
         Sessão iniciada como {session?.user?.email}.
       </Typography>

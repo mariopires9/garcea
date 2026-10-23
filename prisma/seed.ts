@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "../src/lib/prisma";
+import { BCRYPT_COST } from "../src/lib/config";
 
 async function main() {
   const email = process.env.SEED_ADMIN_EMAIL;
@@ -12,7 +13,7 @@ async function main() {
     );
   }
 
-  const passwordHash = await bcrypt.hash(password, 12);
+  const passwordHash = await bcrypt.hash(password, BCRYPT_COST);
 
   const user = await prisma.user.upsert({
     where: { email },

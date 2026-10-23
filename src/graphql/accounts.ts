@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { GraphQLError } from "graphql";
 import { prisma } from "@/lib/prisma";
+import { BCRYPT_COST, MIN_PASSWORD_LENGTH } from "@/lib/config";
 import { requireUserId, type GraphQLContext } from "./context";
 
 // Permission model (all enforced here, server-side):
@@ -9,7 +10,6 @@ import { requireUserId, type GraphQLContext } from "./context";
 // - only the owner can add/remove accounts and edit other accounts;
 // - the owner account can't be removed.
 
-const MIN_PASSWORD_LENGTH = 8;
 
 type UserInput = { name: string; email: string };
 type CreateUserInput = UserInput & { password: string };
@@ -66,7 +66,7 @@ function hashPassword(password: string) {
   if (password.length < MIN_PASSWORD_LENGTH) {
     throw badInput(`A palavra-passe deve ter pelo menos ${MIN_PASSWORD_LENGTH} caracteres.`);
   }
-  return bcrypt.hash(password, 12);
+  return bcrypt.hash(password, BCRYPT_COST);
 }
 
 export const accountQueries = {

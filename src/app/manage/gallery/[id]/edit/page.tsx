@@ -15,6 +15,7 @@ import { BackButton } from "@/components/BackButton";
 import { FormCard } from "@/components/FormCard";
 import { ImageCompressingForm } from "@/components/ImageCompressingForm";
 import { SubmitButton } from "@/components/SubmitButton";
+import { PHOTO_MAX_DIMENSION } from "@/lib/config";
 import { updateGalleryItemAction } from "../../actions";
 
 type GalleryItemData = {
@@ -55,7 +56,7 @@ export default async function EditGalleryItemPage({
         {isPhoto ? "Editar Foto" : "Editar Vídeo"}
       </Typography>
       <FormCard error={error}>
-        <ImageCompressingForm action={updateWithId} imageField="photo" maxDimension={1920}>
+        <ImageCompressingForm action={updateWithId} imageField="photo" maxDimension={PHOTO_MAX_DIMENSION}>
           {isPhoto ? (
             <Stack spacing={1}>
               <Typography variant="body2" color="text.secondary">

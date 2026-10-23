@@ -1012,6 +1012,68 @@ Derived from [PLAN.md](./PLAN.md). Check items off as they're completed.
 - Gotcha: `pkill -f "next dev"` also matches (and kills) the shell running
   it - stop the dev server by PID instead.
 
+## Settings as environment variables (with the current values as defaults)
+
+- [x] `src/lib/config.ts` holds every tunable setting; each reads an env
+      var and falls back to the previous hard-coded value when it's unset,
+      empty or invalid (out-of-range values are clamped, with a
+      `console.warn` naming the variable). All names, defaults and ranges
+      are documented in `.env.example` (now committed: `.gitignore` has
+      `!.env.example`).
+  | Variable | Default | Range |
+  |---|---|---|
+  | `NEXT_PUBLIC_SITE_NAME` | Associação GARCEA | - |
+  | `SITE_DESCRIPTION` | (previous text) | - |
+  | `GALLERY_PAGE_SIZE` | 24 | 1-200 |
+  | `NEXT_PUBLIC_MAX_UPLOAD_MB` | 4 | 0.5-4.4 (Vercel's 4.5MB cap) |
+  | `NEXT_PUBLIC_MAX_PHOTOS_PER_UPLOAD` | 15 | 1-100 |
+  | `NEXT_PUBLIC_PHOTO_MAX_DIMENSION` | 1920 | 320-8000 |
+  | `NEXT_PUBLIC_POSTER_MAX_DIMENSION` | 2560 | 320-8000 |
+  | `NEXT_PUBLIC_IMAGE_QUALITY` | 0.82 | 0.1-1 |
+  | `MIN_PASSWORD_LENGTH` | 8 | 8-128 (can't be lowered) |
+- `NEXT_PUBLIC_*` = also used in the browser, so Next.js inlines them at
+  build time: changing one on Vercel needs a redeploy. Each must be read
+  as a literal `process.env.NEXT_PUBLIC_X` (no dynamic names) for the
+  inlining to work. Verified: a build with
+  `NEXT_PUBLIC_MAX_PHOTOS_PER_UPLOAD=7` has `"7"` in the browser chunk;
+  without it, the browser falls back to 15.
+- Deliberately not configurable: `HISTORIAL_SECTION_ID` and the
+  `VALID_*` lists (must match the DB/GraphQL enums).
+- [x] Contradictions fixed while wiring it up: the server-side file
+      limits (8MB photo / 15MB poster) could never be reached under the
+      4MB request cap - both now use `MAX_UPLOAD_BYTES`; `next.config.ts`
+      `bodySizeLimit` is derived from `MAX_UPLOAD_MB` (+1MB) instead of a
+      fixed 40mb. The site name now also comes from the setting in the
+      header, footer and the `/manage` title. `src/lib/upload-limits.ts`
+      was folded into the config; the seed script uses `BCRYPT_COST` too.
+- [x] `BCRYPT_COST` stays a fixed constant (12) in `src/lib/config.ts`,
+      not an environment variable: a security setting that shouldn't vary
+      per deployment.
+- [x] Empty values (`NAME=` lines copied from `.env.example`) now count as
+      unset everywhere: `NEXT_PUBLIC_SITE_URL` and `SUPABASE_STORAGE_BUCKET`
+      used `??`, so an empty value would have broken `metadataBase`
+      (`new URL("")`) or pointed uploads at a bucket with no name.
+- [ ] Clean up unused variables in `.env.local` and Vercel: `CRON_SECRET`
+      (its route was removed), `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+      (never used), `VERCEL_OIDC_TOKEN` (short-lived token from `vercel env
+      pull`) and `SEED_ADMIN_PASSWORD` (no longer matches the account).
+      Keep `NEXTAUTH_URL`: Auth.js v5 still reads it (as an alias of
+      `AUTH_URL`) to build login redirect URLs, so it must stay the real
+      production address.
+
+## Remove the unused public /gallery page
+
+The public `/gallery` page had no link anywhere (it was dropped from the nav
+and the sitemap) and was only reachable by typing the address.
+
+- [x] Deleted `src/app/gallery/` (page + loading) and `GalleryGrid.tsx`,
+      which only that page used.
+- [x] Dropped the `revalidatePath("/gallery")` calls from the gallery
+      actions and the sitemap comment about it.
+- [x] Photos and videos are unchanged: they still show on the home page
+      carousels, the event pages and `/manage/gallery`, which keeps using
+      `GALLERY_PAGE_SIZE` for "Ver mais".
+
 ## Backlog: improvement ideas (free-tier aware)
 
 From a functionality review. Ordered roughly by value; constraints of the

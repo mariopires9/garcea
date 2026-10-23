@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
-
-export const SITE_NAME = "Associação GARCEA";
-export const SITE_DESCRIPTION =
-  "Site oficial da Associação GARCEA e do Rancho Folclórico das Lavradeiras de Gondar: eventos, historial e contactos.";
+import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/config";
 
 // NEXT_PUBLIC_SITE_URL wins (e.g. https://associacaogarcea.pt once the domain
 // is live); otherwise Vercel's auto-set production domain, then localhost.
+// `||` rather than `??` so an empty `NEXT_PUBLIC_SITE_URL=` also falls back.
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ??
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
   (process.env.VERCEL_PROJECT_PRODUCTION_URL
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : "http://localhost:3000");

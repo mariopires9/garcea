@@ -9,6 +9,7 @@ import { auth, signOut } from "@/auth";
 import { NavMobileMenu } from "@/components/NavMobileMenu";
 import { SubmitButton } from "@/components/SubmitButton";
 import { ColorModeToggle } from "@/components/ColorModeToggle";
+import { SITE_NAME } from "@/lib/config";
 
 const links = [
   { href: "/", label: "Início" },
@@ -49,7 +50,7 @@ export async function Nav() {
               whiteSpace: "nowrap",
             }}
           >
-            Associação GARCEA
+            {SITE_NAME}
           </Box>
         </MuiLink>
 

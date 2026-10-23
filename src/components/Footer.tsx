@@ -6,6 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import { executeGraphQL } from "@/lib/graphql-server";
 import { SOCIAL_LINKS_QUERY } from "@/lib/queries/socialLinks";
 import { SocialIcon, SOCIAL_PLATFORM_LABELS } from "@/components/SocialIcon";
+import { SITE_NAME } from "@/lib/config";
 
 type SocialLinksData = {
   socialLinks: { id: string; platform: string; url: string }[];
@@ -29,7 +30,7 @@ export async function Footer() {
         }}
       >
         <Typography variant="body2" color="text.secondary">
-          © {year} Associação GARCEA. Todos os direitos reservados.
+          © {year} {SITE_NAME}. Todos os direitos reservados.
         </Typography>
         {data.socialLinks.length > 0 && (
           <Stack direction="row" spacing={1}>

@@ -6,7 +6,8 @@ import Box from "@mui/material/Box";
 import { ThemeRegistry } from "@/components/ThemeRegistry";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
-import { SITE_NAME, SITE_URL, pageMetadata } from "@/lib/site";
+import { SITE_URL, pageMetadata } from "@/lib/site";
+import { SITE_NAME } from "@/lib/config";
 import "./globals.css";
 
 const geistSans = Geist({

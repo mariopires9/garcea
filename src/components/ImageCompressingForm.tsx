@@ -4,7 +4,7 @@ import { useState, type ReactNode } from "react";
 import Stack from "@mui/material/Stack";
 import Alert from "@mui/material/Alert";
 import { compressImagesInFormData } from "@/lib/compress-image";
-import { MAX_UPLOAD_BYTES } from "@/lib/upload-limits";
+import { MAX_UPLOAD_BYTES } from "@/lib/config";
 
 function toMegabytes(bytes: number) {
   return (bytes / (1024 * 1024)).toFixed(1).replace(".", ",");

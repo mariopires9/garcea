@@ -5,8 +5,6 @@ import { SITE_URL } from "@/lib/site";
 
 type EventsData = { events: { id: string; title: string; date: string }[] };
 
-// /gallery is left out on purpose: it was removed from the nav and is only
-// reachable by direct link.
 const STATIC_PATHS = ["/", "/events", "/history", "/contacts"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

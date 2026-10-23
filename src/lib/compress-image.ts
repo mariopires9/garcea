@@ -2,7 +2,7 @@
 // of the Supabase free-tier storage/egress (a 4-6MB phone photo typically ends
 // up at ~200-400KB) and stay well under the request body limits.
 
-const DEFAULT_QUALITY = 0.82;
+import { IMAGE_QUALITY } from "@/lib/config";
 
 function canvasToBlob(
   canvas: HTMLCanvasElement,
@@ -14,7 +14,7 @@ function canvasToBlob(
 
 export async function compressImage(
   file: File,
-  { maxDimension, quality = DEFAULT_QUALITY }: { maxDimension: number; quality?: number },
+  { maxDimension, quality = IMAGE_QUALITY }: { maxDimension: number; quality?: number },
 ): Promise<File> {
   // GIFs may be animated and SVGs are vectors: re-encoding would break them.
   if (

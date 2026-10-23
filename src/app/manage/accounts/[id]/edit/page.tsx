@@ -9,6 +9,7 @@ import { PageContainer } from "@/components/PageContainer";
 import { BackButton } from "@/components/BackButton";
 import { FormCard } from "@/components/FormCard";
 import { SubmitButton } from "@/components/SubmitButton";
+import { MIN_PASSWORD_LENGTH } from "@/lib/config";
 import { updateUserAction, changePasswordAction } from "../../actions";
 
 type AccountData = { me: Account; user: Account | null };
@@ -79,7 +80,7 @@ export default async function EditAccountPage({
             type="password"
             required
             autoComplete="new-password"
-            helperText="Pelo menos 8 caracteres"
+            helperText={`Pelo menos ${MIN_PASSWORD_LENGTH} caracteres`}
           />
           <TextField
             label="Confirmar nova palavra-passe"

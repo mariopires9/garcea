@@ -1,13 +1,13 @@
 import type { NextConfig } from "next";
+import { MAX_UPLOAD_MB } from "./src/lib/config";
 
 const nextConfig: NextConfig = {
   experimental: {
-    // Default is 1MB; photo uploads (src/lib/supabase-storage.ts) allow up to
-    // 8MB each, and the gallery form now allows selecting several photos per
-    // submission, so raise the Server Action body limit to fit a handful of
-    // them (with headroom for multipart/form-data overhead).
+    // Default is 1MB. Uploads are capped at MAX_UPLOAD_MB per request (Vercel
+    // rejects anything over 4.5MB anyway), plus 1MB headroom for the other
+    // form fields and multipart overhead.
     serverActions: {
-      bodySizeLimit: "40mb",
+      bodySizeLimit: `${Math.ceil(MAX_UPLOAD_MB) + 1}mb`,
     },
   },
 };

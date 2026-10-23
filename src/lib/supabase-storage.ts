@@ -1,9 +1,12 @@
+import { MAX_UPLOAD_BYTES, MAX_UPLOAD_MB } from "@/lib/config";
+
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const BUCKET = process.env.SUPABASE_STORAGE_BUCKET ?? "gallery-photos";
+const BUCKET = process.env.SUPABASE_STORAGE_BUCKET?.trim() || "gallery-photos";
 
-const MAX_PHOTO_BYTES = 8 * 1024 * 1024;
-const MAX_POSTER_BYTES = 15 * 1024 * 1024;
+// A single file can't be bigger than the whole upload request Vercel accepts.
+const MAX_FILE_BYTES = MAX_UPLOAD_BYTES;
+const MAX_FILE_LABEL = `${String(MAX_UPLOAD_MB).replace(".", ",")}MB`;
 
 async function uploadToStorage(file: File): Promise<string> {
   const arrayBuffer = await file.arrayBuffer();
@@ -32,8 +35,8 @@ export async function uploadPhoto(file: File): Promise<string> {
   if (!file.type.startsWith("image/")) {
     throw new Error("Só são permitidos ficheiros de imagem como fotos.");
   }
-  if (file.size > MAX_PHOTO_BYTES) {
-    throw new Error("A foto é demasiado grande (máx. 8MB).");
+  if (file.size > MAX_FILE_BYTES) {
+    throw new Error(`A foto é demasiado grande (máx. ${MAX_FILE_LABEL}).`);
   }
   return uploadToStorage(file);
 }
@@ -45,8 +48,8 @@ export async function uploadPoster(file: File): Promise<string> {
   if (!isImage && !isPdf) {
     throw new Error("Só são permitidos ficheiros de imagem ou PDF para o cartaz.");
   }
-  if (file.size > MAX_POSTER_BYTES) {
-    throw new Error("O ficheiro é demasiado grande (máx. 15MB).");
+  if (file.size > MAX_FILE_BYTES) {
+    throw new Error(`O ficheiro é demasiado grande (máx. ${MAX_FILE_LABEL}).`);
   }
   return uploadToStorage(file);
 }

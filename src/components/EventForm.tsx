@@ -10,6 +10,7 @@ import { isPdfUrl } from "@/lib/supabase-storage";
 import { FormCard } from "@/components/FormCard";
 import { SubmitButton } from "@/components/SubmitButton";
 import { ImageCompressingForm } from "@/components/ImageCompressingForm";
+import { POSTER_MAX_DIMENSION } from "@/lib/config";
 
 type EventFormValues = {
   title: string;
@@ -41,7 +42,7 @@ export function EventForm({
   return (
     <FormCard error={error}>
       {/* Posters often carry small text, so keep more resolution than gallery photos. */}
-      <ImageCompressingForm action={action} imageField="cartaz" maxDimension={2560}>
+      <ImageCompressingForm action={action} imageField="cartaz" maxDimension={POSTER_MAX_DIMENSION}>
         <TextField label="Título" name="title" required defaultValue={defaultValues?.title} />
         <TextField
           label="Descrição"

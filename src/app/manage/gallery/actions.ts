@@ -10,7 +10,7 @@ import {
 import { withFlash } from "@/lib/flash";
 import { uploadPhoto, deletePhoto } from "@/lib/supabase-storage";
 import { normalizeVideoUrl } from "@/lib/video";
-import { MAX_PHOTOS_PER_UPLOAD } from "@/lib/upload-limits";
+import { MAX_PHOTOS_PER_UPLOAD } from "@/lib/config";
 import {
   CREATE_GALLERY_ITEM_MUTATION,
   GALLERY_ITEM_QUERY,
@@ -97,7 +97,6 @@ export async function createGalleryItemAction(formData: FormData) {
     }
   }
 
-  revalidatePath("/gallery");
   if (eventId) revalidatePath(`/events/${eventId}`);
   revalidatePath("/manage/gallery");
   redirect(
@@ -145,7 +144,6 @@ export async function updateGalleryItemAction(id: string, formData: FormData) {
     throw error;
   }
 
-  revalidatePath("/gallery");
   revalidatePath("/manage/gallery");
   revalidatePath("/");
   if (item.event) revalidatePath(`/events/${item.event.id}`);
@@ -158,7 +156,6 @@ export async function deleteGalleryItemAction(id: string) {
     executeGraphQL(DELETE_GALLERY_ITEM_MUTATION, { id }),
   );
 
-  revalidatePath("/gallery");
   revalidatePath("/manage/gallery");
   redirect(
     withFlash("/manage/gallery", { success: "Item eliminado com sucesso." }),
@@ -177,7 +174,6 @@ export async function deleteGalleryItemsAction(formData: FormData) {
   );
   const count = data.deleteGalleryItems;
 
-  revalidatePath("/gallery");
   revalidatePath("/manage/gallery");
   redirect(
     withFlash("/manage/gallery", {

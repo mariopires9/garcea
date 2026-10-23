@@ -12,7 +12,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { FormCard } from "@/components/FormCard";
 import { SubmitButton } from "@/components/SubmitButton";
 import { ImageCompressingForm } from "@/components/ImageCompressingForm";
-import { MAX_PHOTOS_PER_UPLOAD } from "@/lib/upload-limits";
+import { MAX_PHOTOS_PER_UPLOAD, PHOTO_MAX_DIMENSION } from "@/lib/config";
 
 type EventOption = { id: string; title: string };
 
@@ -30,7 +30,7 @@ export function GalleryItemForm({
 
   return (
     <FormCard error={error}>
-      <ImageCompressingForm action={action} imageField="photo" maxDimension={1920}>
+      <ImageCompressingForm action={action} imageField="photo" maxDimension={PHOTO_MAX_DIMENSION}>
         <FormControl fullWidth>
           <InputLabel id="type-label">Tipo</InputLabel>
           <Select
