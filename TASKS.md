@@ -1148,6 +1148,40 @@ paused Vercel functions keep idle connections open, so the slots ran out:
   requests all returned 200 with no connection errors; gallery cards still
   show their event and the home page its photos.
 
+## Visitor analytics (Vercel Web Analytics)
+
+- [x] `@vercel/analytics` 2.0.1; `SiteAnalytics` (client component) in the
+      root layout counts page views. Cookie-free, so no consent banner.
+- [x] `/manage/*` and `/login` are ignored (`beforeSend` returns null), so
+      admin visits don't count.
+- [ ] **Enable it in Vercel** (Mario): Project -> Analytics -> Enable. Data
+      only starts after the next deploy.
+- Hobby limits: 50,000 events/month (one page view = one event), data kept
+  for 1 month; over the limit, collection pauses (no charge). Custom events
+  (e.g. counting share-button clicks) need Pro.
+- Verified in dev (debug mode logs instead of sending): `/`, `/events`,
+  `/contacts` produce page views; `/manage`, `/manage/gallery`, `/login`
+  are ignored. Views appear twice in dev only (React Strict Mode runs the
+  effect twice); production sends one.
+
+### Estatísticas page in /manage
+
+- [x] `/manage/analytics` ("Estatísticas" card on `/manage`): visitors and
+      page views for the last 7 or 30 days, a page-views-per-day bar chart
+      (hover for the numbers, "Ver em tabela" for a table), and top pages
+      (event pages shown by title), referrers, countries and devices.
+- [x] Data from Vercel's Web Analytics REST API (`src/lib/vercel-analytics.ts`,
+      server only), cached 10 minutes. Settings: `VERCEL_ANALYTICS_TOKEN`
+      (secret), `VERCEL_ANALYTICS_TEAM_ID`, optional
+      `VERCEL_ANALYTICS_PROJECT_ID` (default `garcea`).
+- [x] Without the token the page shows the setup steps; API errors show a
+      message (401/403 token, 402 plan) instead of breaking the page.
+- [ ] Mario: create the token and add both variables on Vercel. Vercel's
+      docs don't say whether the API is available on Hobby; if it returns
+      402 the page says so and the data stays in the Vercel dashboard.
+- Verified against a local fake API (light, dark, phone; 7 and 30 days;
+  tooltip; error 402) and with no token configured.
+
 ## Backlog: improvement ideas (free-tier aware)
 
 From a functionality review. Ordered roughly by value; constraints of the
@@ -1216,7 +1250,7 @@ Vercel Hobby + Supabase free plans are noted where they matter.
       tier (3,000/month) - or just make WhatsApp/phone more prominent.
 - [ ] Draft/hidden state for events and gallery items.
 - [ ] Filter events by year/type in the GraphQL query instead of in JS.
-- [ ] Analytics: Vercel Web Analytics (free on Hobby) or GoatCounter.
+- [x] Analytics: Vercel Web Analytics - see "Visitor analytics".
 - [ ] Meaningful `alt` text for event posters (currently `alt=""`).
 
 ## SEO + link previews (metadata, Open Graph, sitemap, robots)

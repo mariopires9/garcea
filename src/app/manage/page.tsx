@@ -11,6 +11,7 @@ import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
 import ShareIcon from "@mui/icons-material/Share";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import InsightsIcon from "@mui/icons-material/Insights";
 import type { ReactNode } from "react";
 import { PageContainer } from "@/components/PageContainer";
 import { PageTitle } from "@/components/PageTitle";
@@ -60,6 +61,12 @@ const links: {
     label: "Gerir Contas",
     icon: <ManageAccountsIcon />,
     color: "primary",
+  },
+  {
+    href: "/manage/analytics",
+    label: "Estatísticas",
+    icon: <InsightsIcon />,
+    color: "secondary",
   },
 ];
 

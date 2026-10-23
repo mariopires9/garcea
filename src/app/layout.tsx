@@ -7,6 +7,7 @@ import { ThemeRegistry } from "@/components/ThemeRegistry";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { SiteAnalytics } from "@/components/SiteAnalytics";
 import { INSTALL_PROMPT_CAPTURE_SCRIPT } from "@/lib/pwa-install";
 import { SITE_URL, pageMetadata } from "@/lib/site";
 import { SITE_NAME } from "@/lib/config";
@@ -57,6 +58,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               {children}
               <Footer />
               <ServiceWorkerRegister />
+              <SiteAnalytics />
             </Box>
           </ThemeRegistry>
         </AppRouterCacheProvider>
