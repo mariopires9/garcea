@@ -50,17 +50,23 @@ function StatTile({ label, value }: { label: string; value: number }) {
   );
 }
 
-/** A "top N" list: name, a thin bar for the share of page views, and the count. */
+const METRIC_LABELS = { pageviews: "Visualizações", visitors: "Visitantes" } as const;
+
+/** A "top N" list: name, a thin bar for its share of `metric`, and the count. */
 function RankedList({
   title,
-  rows,
+  rows: unsorted,
   label,
+  metric,
 }: {
   title: string;
   rows: RankedRow[];
   label: (key: string) => string;
+  metric: keyof typeof METRIC_LABELS;
 }) {
-  const max = Math.max(1, ...rows.map((row) => row.pageviews));
+  // The API ranks by page views; re-rank when showing visitors.
+  const rows = [...unsorted].sort((a, b) => b[metric] - a[metric]);
+  const max = Math.max(1, ...rows.map((row) => row[metric]));
   return (
     <Card variant="outlined" sx={{ p: 2.5 }}>
       <Typography component="h2" sx={{ fontWeight: 600, mb: 1.5 }}>
@@ -75,7 +81,7 @@ function RankedList({
           <Box component="thead" sx={visuallyHidden}>
             <tr>
               <th>Nome</th>
-              <th>Visualizações</th>
+              <th>{METRIC_LABELS[metric]}</th>
             </tr>
           </Box>
           <tbody>
@@ -92,7 +98,7 @@ function RankedList({
                       mt: 0.5,
                       height: 4,
                       borderRadius: 2,
-                      width: `${Math.max(2, (row.pageviews / max) * 100)}%`,
+                      width: `${Math.max(2, (row[metric] / max) * 100)}%`,
                     }}
                   />
                 </Box>
@@ -101,7 +107,7 @@ function RankedList({
                   sx={{ py: 0.75, textAlign: "right", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}
                 >
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {numberFormat.format(row.pageviews)}
+                    {numberFormat.format(row[metric])}
                   </Typography>
                 </Box>
               </Box>
@@ -243,9 +249,24 @@ export default async function ManageAnalyticsPage({
               gap: 2,
             }}
           >
-            <RankedList title="Páginas mais vistas" rows={result.summary.top.requestPath} label={labels.requestPath} />
-            <RankedList title="Países" rows={result.summary.top.country} label={labels.country} />
-            <RankedList title="Dispositivos" rows={result.summary.top.deviceType} label={labels.deviceType} />
+            <RankedList
+              title="Páginas mais vistas"
+              rows={result.summary.top.requestPath}
+              label={labels.requestPath}
+              metric="pageviews"
+            />
+            <RankedList
+              title="Países"
+              rows={result.summary.top.country}
+              label={labels.country}
+              metric="visitors"
+            />
+            <RankedList
+              title="Dispositivos"
+              rows={result.summary.top.deviceType}
+              label={labels.deviceType}
+              metric="visitors"
+            />
           </Box>
         </>
       )}
