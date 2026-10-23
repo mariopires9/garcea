@@ -1169,16 +1169,17 @@ paused Vercel functions keep idle connections open, so the slots ran out:
 - [x] `/manage/analytics` ("Estatísticas" card on `/manage`): visitors and
       page views for the last 7 or 30 days, a page-views-per-day bar chart
       (hover for the numbers, "Ver em tabela" for a table), and top pages
-      (event pages shown by title), referrers, countries and devices.
+      (event pages shown by title), countries and devices.
 - [x] Data from Vercel's Web Analytics REST API (`src/lib/vercel-analytics.ts`,
       server only), cached 10 minutes. Settings: `VERCEL_ANALYTICS_TOKEN`
       (secret), `VERCEL_ANALYTICS_TEAM_ID`, optional
       `VERCEL_ANALYTICS_PROJECT_ID` (default `garcea`).
 - [x] Without the token the page shows the setup steps; API errors show a
       message (401/403 token, 402 plan) instead of breaking the page.
-- [ ] Mario: create the token and add both variables on Vercel. Vercel's
-      docs don't say whether the API is available on Hobby; if it returns
-      402 the page says so and the data stays in the Vercel dashboard.
+- [x] Token and variables set on Vercel; the API works on Hobby.
+- [x] Totals now come from `visits/aggregate` grouped by `environment`
+      (the `visits/count` endpoint returned 0 while the chart showed 5
+      views). "De onde vêm" (referrers) removed - not useful.
 - Verified against a local fake API (light, dark, phone; 7 and 30 days;
   tooltip; error 402) and with no token configured.
 

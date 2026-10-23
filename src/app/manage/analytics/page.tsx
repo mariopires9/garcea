@@ -165,8 +165,6 @@ export default async function ManageAnalyticsPage({
       if (eventId) return `Evento: ${eventTitles.get(eventId) ?? "(eliminado)"}`;
       return path === "Others" ? "Outras" : path;
     },
-    referrerHostname: (host) =>
-      !host ? "Direto (sem origem)" : host === "Others" ? "Outras" : host.replace(/^www\./, ""),
     country: (code) => {
       if (code === "Others") return "Outros";
       try {
@@ -246,7 +244,6 @@ export default async function ManageAnalyticsPage({
             }}
           >
             <RankedList title="Páginas mais vistas" rows={result.summary.top.requestPath} label={labels.requestPath} />
-            <RankedList title="De onde vêm" rows={result.summary.top.referrerHostname} label={labels.referrerHostname} />
             <RankedList title="Países" rows={result.summary.top.country} label={labels.country} />
             <RankedList title="Dispositivos" rows={result.summary.top.deviceType} label={labels.deviceType} />
           </Box>

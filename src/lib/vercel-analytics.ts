@@ -11,7 +11,7 @@ export type Totals = { pageviews: number; visitors: number };
 export type DailyRow = Totals & { day: string };
 export type RankedRow = Totals & { key: string };
 
-export type AnalyticsDimension = "requestPath" | "referrerHostname" | "country" | "deviceType";
+export type AnalyticsDimension = "requestPath" | "country" | "deviceType";
 
 export type AnalyticsSummary = {
   since: string;
@@ -26,7 +26,7 @@ export type AnalyticsResult =
   | { status: "not-configured" }
   | { status: "error"; httpStatus: number | null; message: string };
 
-const DIMENSIONS: AnalyticsDimension[] = ["requestPath", "referrerHostname", "country", "deviceType"];
+const DIMENSIONS: AnalyticsDimension[] = ["requestPath", "country", "deviceType"];
 
 class AnalyticsApiError extends Error {
   constructor(
@@ -45,7 +45,7 @@ function config() {
 }
 
 async function query<T>(
-  endpoint: "count" | "aggregate",
+  endpoint: "aggregate",
   params: Record<string, string>,
   { token, teamId, projectId }: NonNullable<ReturnType<typeof config>>,
 ): Promise<T> {
@@ -83,8 +83,12 @@ export async function getAnalyticsSummary(days: number): Promise<AnalyticsResult
   const range = { since: start.toISOString(), until: now.toISOString() };
 
   try {
-    const [totals, dailyRows, ...topRows] = await Promise.all([
-      query<Totals>("count", range, settings),
+    // Totals come from the same aggregate data as the chart and lists (the
+    // separate "count" endpoint returned 0 while these already had views).
+    // Production is the only environment counted, so grouping by it gives
+    // one row with the range's page views and distinct visitors.
+    const [totalRows, dailyRows, ...topRows] = await Promise.all([
+      query<Totals[]>("aggregate", { ...range, by: "environment" }, settings),
       query<(Totals & { timestamp: string })[]>("aggregate", { ...range, by: "day" }, settings),
       ...DIMENSIONS.map((dimension) =>
         query<(Totals & Record<string, unknown>)[]>(
@@ -119,7 +123,15 @@ export async function getAnalyticsSummary(days: number): Promise<AnalyticsResult
 
     return {
       status: "ok",
-      summary: { ...range, totals: { pageviews: totals.pageviews, visitors: totals.visitors }, daily, top },
+      summary: {
+        ...range,
+        totals: {
+          pageviews: totalRows.reduce((sum, row) => sum + row.pageviews, 0),
+          visitors: totalRows.reduce((sum, row) => sum + row.visitors, 0),
+        },
+        daily,
+        top,
+      },
     };
   } catch (error) {
     const httpStatus = error instanceof AnalyticsApiError ? error.httpStatus : null;
