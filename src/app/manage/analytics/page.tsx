@@ -119,10 +119,15 @@ function RankedList({
   );
 }
 
+// Hidden on screen, still read by screen readers. Sizes are "1px" strings:
+// in MUI's sx a bare 1 means 100%, which stretched these over the whole page.
 const visuallyHidden = {
   position: "absolute",
-  width: 1,
-  height: 1,
+  width: "1px",
+  height: "1px",
+  margin: "-1px",
+  padding: 0,
+  border: 0,
   overflow: "hidden",
   clip: "rect(0 0 0 0)",
   whiteSpace: "nowrap",

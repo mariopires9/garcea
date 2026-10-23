@@ -1182,6 +1182,10 @@ paused Vercel functions keep idle connections open, so the slots ran out:
       views). "De onde vêm" (referrers) removed - not useful.
 - Verified against a local fake API (light, dark, phone; 7 and 30 days;
   tooltip; error 402) and with no token configured.
+- [x] Fixed: the screen-reader-only table headers used `width: 1` /
+      `height: 1`, which MUI's sx reads as 100%, so they stretched the page
+      (blank area below the footer and sideways scroll on phones). Now
+      `"1px"`.
 
 ## Backlog: improvement ideas (free-tier aware)
 
