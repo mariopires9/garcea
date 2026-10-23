@@ -7,6 +7,7 @@ import { executeGraphQL } from "@/lib/graphql-server";
 import { SOCIAL_LINKS_QUERY } from "@/lib/queries/socialLinks";
 import { SocialIcon, SOCIAL_PLATFORM_LABELS } from "@/components/SocialIcon";
 import { SITE_NAME } from "@/lib/config";
+import { InstallAppButton } from "@/components/InstallAppButton";
 
 type SocialLinksData = {
   socialLinks: { id: string; platform: string; url: string }[];
@@ -32,6 +33,7 @@ export async function Footer() {
         <Typography variant="body2" color="text.secondary">
           © {year} {SITE_NAME}. Todos os direitos reservados.
         </Typography>
+        <InstallAppButton />
         {data.socialLinks.length > 0 && (
           <Stack direction="row" spacing={1}>
             {data.socialLinks.map((link) => (

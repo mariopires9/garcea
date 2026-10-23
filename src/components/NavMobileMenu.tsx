@@ -10,6 +10,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
 import MenuIcon from "@mui/icons-material/Menu";
+import { InstallAppButton } from "@/components/InstallAppButton";
 
 type NavLink = { href: string; label: string };
 
@@ -78,6 +79,7 @@ export function NavMobileMenu({
                 <ListItemText primary="Entrar" />
               </ListItemButton>
             )}
+            <InstallAppButton variant="listItem" onDone={() => setOpen(false)} />
           </List>
         </Box>
       </Drawer>

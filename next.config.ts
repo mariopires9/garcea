@@ -10,6 +10,18 @@ const nextConfig: NextConfig = {
       bodySizeLimit: `${Math.ceil(MAX_UPLOAD_MB) + 1}mb`,
     },
   },
+  async headers() {
+    return [
+      {
+        // Browsers must always fetch the latest service worker.
+        source: "/sw.js",
+        headers: [
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+          { key: "Content-Type", value: "application/javascript; charset=utf-8" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

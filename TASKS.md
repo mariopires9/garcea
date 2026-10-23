@@ -1095,6 +1095,35 @@ and the sitemap) and was only reachable by typing the address.
   and with Web Share available the native sheet is called with the event's
   title and URL and no dialog is shown.
 
+## Installable app (PWA) + "Instalar app" button
+
+- [x] `src/app/manifest.ts` (served at `/manifest.webmanifest`): name,
+      short name "GARCEA", standalone display, white theme, icons.
+- [x] Icons made from `public/logo.png` on a white background (home
+      screens fill transparency with black): `public/icons/icon-192.png`,
+      `icon-512.png`, `icon-maskable-512.png` (logo inside Android's 80% safe
+      zone) and `src/app/apple-icon.png` (180px, iPhone/iPad).
+- [x] Root layout: `appleWebApp` metadata (opens full screen on iOS, title
+      "GARCEA") and `viewport.themeColor` for light/dark.
+- [x] `public/sw.js` + `ServiceWorkerRegister` (production only): pages
+      always come from the network, nothing is cached except
+      `public/offline.html`, shown when there's no connection. `/sw.js` is
+      served with `no-cache` (`next.config.ts` headers).
+- [x] `InstallAppButton` ("Instalar app") in the footer and in the mobile
+      menu:
+  - Android / desktop Chrome and Edge: opens the browser's install dialog
+    (`beforeinstallprompt`, captured early by an inline script in the
+    layout - `src/lib/pwa-install.ts`).
+  - iPhone/iPad: no install API, so it shows the 3 steps (Partilhar ->
+    Adicionar ao ecrã principal -> Adicionar).
+  - Hidden where installing isn't possible (e.g. Firefox desktop) and once
+    the app is installed / opened from the home screen.
+- Verified on a production build in headless Chromium: Chrome reports no
+  installability errors, the service worker activates, the button appears
+  when the browser offers installation and opens its dialog, the offline
+  page shows with no connection, the iPhone steps dialog opens from the
+  menu, and no button is shown in the installed app.
+
 ## Backlog: improvement ideas (free-tier aware)
 
 From a functionality review. Ordered roughly by value; constraints of the
@@ -1156,6 +1185,13 @@ Vercel Hobby + Supabase free plans are noted where they matter.
       `location`. (Share button done - see "Share button on event pages".)
 - [x] Account management (Phase 8 above) - see "Account management with a
       protected owner".
+- [ ] Database connections: `DATABASE_URL` uses Supabase's session pooler
+      (port 5432), limited to 15 clients shared by production, local dev
+      and builds; each Prisma/`pg` pool can open up to 10. While testing on
+      2026-10-23, two local servers hit "EMAXCONNSESSION max clients
+      reached" and pages failed. For Vercel (serverless) switch to the
+      transaction pooler (port 6543) and/or cap the pool (`max`) in
+      `src/lib/prisma.ts`.
 - [ ] Login rate limiting (no Redis in the stack: small Supabase table or
       Upstash free tier).
 - [ ] Optional booking-request form on Contacts, emailed via Resend free
