@@ -984,11 +984,9 @@ Derived from [PLAN.md](./PLAN.md). Check items off as they're completed.
 - [x] Captions removed everywhere (upload form, old "Editar legenda" page,
       text under cards, lightbox, GraphQL types/inputs/queries, Prisma
       schema). None of the 21 items had one, so no content was lost.
-- [ ] Apply migration `20261022190000_remove_gallery_item_caption` (drops
-      `GalleryItem.caption`) **only after** this code is deployed on
-      Vercel: the previous deployment's Prisma client still selects the
-      column, so dropping it first would break the live gallery. Command:
-      `npx prisma migrate deploy --config prisma7.config.ts`.
+- [x] Applied migration `20261022190000_remove_gallery_item_caption`
+      (drops `GalleryItem.caption`) on 2026-10-23, after the code without
+      captions was deployed (0 of 21 items had a caption).
 - [x] "Editar legenda" -> "Editar" on `/manage/gallery`. The edit page
       shows the current photo/video and lets you:
       - photo: optionally pick a new file (compressed in the browser like
