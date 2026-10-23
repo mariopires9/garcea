@@ -1074,6 +1074,27 @@ and the sitemap) and was only reachable by typing the address.
       carousels, the event pages and `/manage/gallery`, which keeps using
       `GALLERY_PAGE_SIZE` for "Ver mais".
 
+## Share button on event pages
+
+- [x] `src/components/ShareButton.tsx`: "Partilhar" button on
+      `/events/[id]`, below the date/location.
+- [x] Where the browser supports the Web Share API (iPhone, Android, Safari,
+      Edge on Windows...) it opens the system share sheet, with every app the
+      user has installed (WhatsApp, Facebook, Messages, copy...).
+- [x] Elsewhere (e.g. Chrome/Firefox on desktop) it opens a "Partilhar
+      evento" dialog: WhatsApp, Facebook, Instagram, X, Email and "Copiar
+      link" (with a "Link copiado." message). Plain share URLs, no
+      third-party scripts.
+- [x] Instagram has no web share URL, so its option copies the link and
+      opens Instagram's messages (instagram.com/direct/inbox) for the user
+      to paste it. On phones the system share sheet already lists the
+      Instagram app.
+- [x] The shared link is the canonical `SITE_URL/events/<id>`, so the
+      preview uses the event's Open Graph tags (title, date/place, poster).
+- Verified in headless Chromium: dialog links and copy-to-clipboard work,
+  and with Web Share available the native sheet is called with the event's
+  title and URL and no dialog is shown.
+
 ## Backlog: improvement ideas (free-tier aware)
 
 From a functionality review. Ordered roughly by value; constraints of the
@@ -1132,7 +1153,7 @@ Vercel Hobby + Supabase free plans are noted where they matter.
       `sitemap.ts` and `robots.ts` - better Facebook/WhatsApp link
       previews and search visibility. See "SEO + link previews" below.
 - [ ] Event detail: "Add to calendar" (.ics), Google Maps link from
-      `location`, share button (WhatsApp).
+      `location`. (Share button done - see "Share button on event pages".)
 - [x] Account management (Phase 8 above) - see "Account management with a
       protected owner".
 - [ ] Login rate limiting (no Redis in the stack: small Supabase table or

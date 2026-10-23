@@ -15,7 +15,8 @@ import { BackButton } from "@/components/BackButton";
 import { PageTitle } from "@/components/PageTitle";
 import { isPdfUrl } from "@/lib/supabase-storage";
 import { EVENT_TYPE_LABELS } from "@/lib/eventTypes";
-import { pageMetadata, toMetaDescription } from "@/lib/site";
+import { ShareButton } from "@/components/ShareButton";
+import { SITE_URL, pageMetadata, toMetaDescription } from "@/lib/site";
 
 type EventData = {
   event: {
@@ -85,6 +86,7 @@ export default async function EventDetailPage({
           {event.location}
         </Typography>
       </Stack>
+      <ShareButton url={`${SITE_URL}/events/${event.id}`} title={event.title} />
       {event.posterUrl &&
         (isPdfUrl(event.posterUrl) ? (
           <Button
