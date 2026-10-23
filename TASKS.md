@@ -1167,7 +1167,7 @@ paused Vercel functions keep idle connections open, so the slots ran out:
 ### Estatísticas page in /manage
 
 - [x] `/manage/analytics` ("Estatísticas" card on `/manage`): visitors and
-      page views for the last 7 or 30 days, a page-views-per-day bar chart
+      page views for the last 7 or 30 days, a visitors-per-day bar chart
       (hover for the numbers, "Ver em tabela" for a table), and top pages
       (event pages shown by title), countries and devices.
 - [x] Data from Vercel's Web Analytics REST API (`src/lib/vercel-analytics.ts`,

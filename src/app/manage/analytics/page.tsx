@@ -231,7 +231,7 @@ export default async function ManageAnalyticsPage({
 
           <Card variant="outlined" sx={{ p: 2.5 }}>
             <Typography component="h2" sx={{ fontWeight: 600, mb: 2 }}>
-              Visualizações por dia
+              Visitantes por dia
             </Typography>
             <AnalyticsDailyChart rows={result.summary.daily} />
           </Card>

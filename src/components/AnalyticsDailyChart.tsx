@@ -21,10 +21,10 @@ function formatDay(day: string, options: Intl.DateTimeFormatOptions) {
   return new Date(`${day}T00:00:00Z`).toLocaleDateString("pt-PT", { timeZone: "UTC", ...options });
 }
 
-/** Page views per day: one bar per day, hover/focus a bar for the numbers. */
+/** Visitors per day: one bar per day, hover/focus a bar for the numbers. */
 export function AnalyticsDailyChart({ rows }: { rows: DailyRow[] }) {
   const [showTable, setShowTable] = useState(false);
-  const max = Math.max(1, ...rows.map((row) => row.pageviews));
+  const max = Math.max(1, ...rows.map((row) => row.visitors));
   const labelEvery = rows.length > 10 ? 7 : 1;
 
   return (
@@ -51,7 +51,7 @@ export function AnalyticsDailyChart({ rows }: { rows: DailyRow[] }) {
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Box
             role="img"
-            aria-label={`Visualizações por dia, máximo ${numberFormat.format(max)}`}
+            aria-label={`Visitantes por dia, máximo ${numberFormat.format(max)}`}
             sx={{
               height: CHART_HEIGHT,
               display: "flex",
@@ -72,9 +72,9 @@ export function AnalyticsDailyChart({ rows }: { rows: DailyRow[] }) {
                   <>
                     <strong>{formatDay(row.day, { weekday: "short", day: "numeric", month: "short" })}</strong>
                     <br />
-                    {numberFormat.format(row.pageviews)} visualizações
-                    <br />
                     {numberFormat.format(row.visitors)} visitantes
+                    <br />
+                    {numberFormat.format(row.pageviews)} visualizações
                   </>
                 }
               >
@@ -98,8 +98,8 @@ export function AnalyticsDailyChart({ rows }: { rows: DailyRow[] }) {
                       // Thin bars: fill narrow columns, but never wider than 40px.
                       width: "100%",
                       maxWidth: 40,
-                      height: `${(row.pageviews / max) * 100}%`,
-                      minHeight: row.pageviews > 0 ? 3 : 0,
+                      height: `${(row.visitors / max) * 100}%`,
+                      minHeight: row.visitors > 0 ? 3 : 0,
                       borderRadius: "4px 4px 0 0",
                     }}
                   />
@@ -133,8 +133,8 @@ export function AnalyticsDailyChart({ rows }: { rows: DailyRow[] }) {
           <TableHead>
             <TableRow>
               <TableCell>Dia</TableCell>
-              <TableCell align="right">Visualizações</TableCell>
               <TableCell align="right">Visitantes</TableCell>
+              <TableCell align="right">Visualizações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -145,8 +145,8 @@ export function AnalyticsDailyChart({ rows }: { rows: DailyRow[] }) {
                     {formatDay(row.day, { weekday: "short", day: "numeric", month: "short" })}
                   </Typography>
                 </TableCell>
-                <TableCell align="right">{numberFormat.format(row.pageviews)}</TableCell>
                 <TableCell align="right">{numberFormat.format(row.visitors)}</TableCell>
+                <TableCell align="right">{numberFormat.format(row.pageviews)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
