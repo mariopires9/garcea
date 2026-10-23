@@ -25,13 +25,6 @@ const links: {
   icon: ReactNode;
   color: "primary" | "secondary";
 }[] = [
-  { href: "/manage/events", label: "Gerir Eventos", icon: <EventIcon />, color: "primary" },
-  {
-    href: "/manage/gallery",
-    label: "Gerir Galeria",
-    icon: <PhotoLibraryIcon />,
-    color: "primary",
-  },
   {
     href: "/manage/home-sections",
     label: "Gerir Secções da Página Inicial",
@@ -43,6 +36,13 @@ const links: {
     label: "Gerir Historial",
     icon: <AutoStoriesIcon />,
     color: "secondary",
+  },
+  { href: "/manage/events", label: "Gerir Eventos", icon: <EventIcon />, color: "primary" },
+  {
+    href: "/manage/gallery",
+    label: "Gerir Galeria",
+    icon: <PhotoLibraryIcon />,
+    color: "primary",
   },
   {
     href: "/manage/official-contacts",

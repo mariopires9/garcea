@@ -61,48 +61,83 @@ export default async function ManageEventsPage({
               variant="outlined"
               sx={{
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
+                alignItems: "flex-start",
                 gap: 2,
                 p: 2,
                 transition: "box-shadow 0.2s ease",
                 "&:hover": { boxShadow: 3 },
               }}
             >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                {event.posterUrl && !isPdfUrl(event.posterUrl) && (
-                  <Box
-                    component="img"
-                    src={event.posterUrl}
-                    alt=""
-                    sx={{ width: "3rem", height: "3rem", objectFit: "cover", borderRadius: 1 }}
-                  />
-                )}
-                <Box>
+              {event.posterUrl && !isPdfUrl(event.posterUrl) && (
+                <Box
+                  component="img"
+                  src={event.posterUrl}
+                  alt=""
+                  sx={{
+                    width: "3.5rem",
+                    height: "3.5rem",
+                    objectFit: "cover",
+                    borderRadius: 1,
+                    flexShrink: 0,
+                  }}
+                />
+              )}
+              {/* Phone: details with the buttons underneath, all in one column so
+                  they line up. Wider screens: buttons on the right. */}
+              <Box
+                sx={{
+                  flex: 1,
+                  minWidth: 0,
+                  display: "flex",
+                  flexDirection: { xs: "column", sm: "row" },
+                  alignItems: { xs: "stretch", sm: "center" },
+                  justifyContent: "space-between",
+                  gap: { xs: 1, sm: 2 },
+                }}
+              >
+                <Box sx={{ minWidth: 0 }}>
                   <Typography sx={{ fontWeight: 500 }}>{event.title}</Typography>
-                  <Stack direction="row" spacing={1} sx={{ alignItems: "center", flexWrap: "wrap", mt: 0.5 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      mt: 0.5,
+                    }}
+                  >
                     <Chip
                       size="small"
                       color="secondary"
                       label={new Date(event.date).toLocaleDateString("pt-PT")}
+                      sx={{ flexShrink: 0 }}
                     />
-                    <Chip size="small" variant="outlined" label={EVENT_TYPE_LABELS[event.type]} />
-                    <Typography variant="body2" color="text.secondary">
+                    <Chip
+                      size="small"
+                      variant="outlined"
+                      label={EVENT_TYPE_LABELS[event.type]}
+                      sx={{ flexShrink: 0 }}
+                    />
+                    {/* Same line as the chips; cut with "..." when it doesn't fit. */}
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      noWrap
+                      title={event.location}
+                      sx={{ minWidth: 0 }}
+                    >
                       {event.location}
                     </Typography>
-                  </Stack>
+                  </Box>
+                </Box>
+                {/* Negative margin on phones: the text buttons' own padding would
+                    otherwise push "Editar" right of the title. */}
+                <Box sx={{ display: "flex", gap: 1, flexShrink: 0, ml: { xs: -1, sm: 0 } }}>
+                  <Button href={`/manage/events/${event.id}/edit`}>Editar</Button>
+                  <Button href={`/manage/events/${event.id}/delete`} color="error">
+                    Eliminar
+                  </Button>
                 </Box>
               </Box>
-              <Stack direction="row" spacing={2}>
-                <Button href={`/manage/events/${event.id}/edit`}>Editar</Button>
-                <Button
-                  href={`/manage/events/${event.id}/delete`}
-                  color="error"
-                >
-                  Eliminar
-                </Button>
-              </Stack>
             </Card>
           ))}
         </Stack>
