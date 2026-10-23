@@ -1,20 +1,23 @@
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
 import Stack from "@mui/material/Stack";
 import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { executeGraphQL } from "@/lib/graphql-server";
 import { OFFICIAL_CONTACTS_QUERY } from "@/lib/queries/officialContacts";
 import { PageContainer } from "@/components/PageContainer";
+import { ManageListCard } from "@/components/ManageListCard";
 import { BackButton } from "@/components/BackButton";
 import { PageTitle } from "@/components/PageTitle";
 import { OfficialContactForm } from "@/components/OfficialContactForm";
+import { SubmitIconButton } from "@/components/SubmitIconButton";
 import { FlashMessage } from "@/components/FlashMessage";
 import {
   OfficialContactIcon,
   OFFICIAL_CONTACT_TYPE_LABELS,
 } from "@/components/OfficialContactIcon";
-import { createOfficialContactAction } from "./actions";
+import { createOfficialContactAction, moveOfficialContactAction } from "./actions";
 
 type OfficialContactsData = {
   officialContacts: {
@@ -39,7 +42,7 @@ export default async function ManageOfficialContactsPage({
       <PageTitle icon={<ContactPhoneIcon />}>Gerir Contactos Oficiais</PageTitle>
       <Typography color="text.secondary">
         Estes emails e números de telefone são mostrados na página pública de
-        Contactos.
+        Contactos, pela ordem apresentada abaixo.
       </Typography>
 
       <OfficialContactForm action={createOfficialContactAction} error={error} />
@@ -49,40 +52,47 @@ export default async function ManageOfficialContactsPage({
         <Typography>Ainda não há contactos oficiais.</Typography>
       ) : (
         <Stack spacing={2}>
-          {data.officialContacts.map((contact) => (
-            <Card
+          {data.officialContacts.map((contact, index) => (
+            <ManageListCard
               key={contact.id}
-              variant="outlined"
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
-                gap: 2,
-                p: 2,
-                transition: "box-shadow 0.2s ease",
-                "&:hover": { boxShadow: 3 },
-              }}
+              leading={
+                <>
+                  <Stack>
+                    <form action={moveOfficialContactAction.bind(null, contact.id, "UP")}>
+                      <SubmitIconButton size="small" disabled={index === 0} aria-label="Subir">
+                        <ArrowUpwardIcon fontSize="small" />
+                      </SubmitIconButton>
+                    </form>
+                    <form action={moveOfficialContactAction.bind(null, contact.id, "DOWN")}>
+                      <SubmitIconButton
+                        size="small"
+                        disabled={index === data.officialContacts.length - 1}
+                        aria-label="Descer"
+                      >
+                        <ArrowDownwardIcon fontSize="small" />
+                      </SubmitIconButton>
+                    </form>
+                  </Stack>
+                  <OfficialContactIcon type={contact.type} color="primary" />
+                </>
+              }
+              actions={
+                <>
+                  <Button href={`/manage/official-contacts/${contact.id}/edit`}>Editar</Button>
+                  <Button href={`/manage/official-contacts/${contact.id}/delete`} color="error">
+                    Eliminar
+                  </Button>
+                </>
+              }
             >
-              <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
-                <OfficialContactIcon type={contact.type} color="primary" />
-                <Stack>
-                  <Typography variant="caption" color="text.secondary">
-                    {OFFICIAL_CONTACT_TYPE_LABELS[contact.type]}
-                    {contact.label ? ` · ${contact.label}` : ""}
-                  </Typography>
-                  <Typography sx={{ fontWeight: 500, wordBreak: "break-all" }}>
-                    {contact.value}
-                  </Typography>
-                </Stack>
-              </Stack>
-              <Button
-                href={`/manage/official-contacts/${contact.id}/delete`}
-                color="error"
-              >
-                Eliminar
-              </Button>
-            </Card>
+              <Typography variant="caption" color="text.secondary">
+                {OFFICIAL_CONTACT_TYPE_LABELS[contact.type]}
+                {contact.label ? ` · ${contact.label}` : ""}
+              </Typography>
+              <Typography noWrap title={contact.value} sx={{ fontWeight: 500 }}>
+                {contact.value}
+              </Typography>
+            </ManageListCard>
           ))}
         </Stack>
       )}

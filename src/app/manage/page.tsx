@@ -15,8 +15,8 @@ import InsightsIcon from "@mui/icons-material/Insights";
 import type { ReactNode } from "react";
 import { PageContainer } from "@/components/PageContainer";
 import { PageTitle } from "@/components/PageTitle";
-import { SubmitButton } from "@/components/SubmitButton";
-import { auth, signOut } from "@/auth";
+import { SignOutButton } from "@/components/SignOutButton";
+import { auth } from "@/auth";
 import { SITE_NAME } from "@/lib/config";
 
 const links: {
@@ -118,14 +118,7 @@ export default async function ManagePage() {
           </Card>
         ))}
       </Box>
-      <form
-        action={async () => {
-          "use server";
-          await signOut({ redirectTo: "/" });
-        }}
-      >
-        <SubmitButton variant="outlined">Sair</SubmitButton>
-      </form>
+      <SignOutButton variant="outlined" sx={{ alignSelf: "flex-start" }} />
     </PageContainer>
   );
 }

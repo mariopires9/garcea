@@ -82,6 +82,7 @@ export const typeDefs = /* GraphQL */ `
     type: OfficialContactType!
     label: String
     value: String!
+    order: Int!
     createdAt: String!
   }
 
@@ -154,7 +155,9 @@ export const typeDefs = /* GraphQL */ `
     homeSection(id: ID!): HomeSection
     historialSection: HistorialSection
     officialContacts: [OfficialContact!]!
+    officialContact(id: ID!): OfficialContact
     socialLinks: [SocialLink!]!
+    socialLink(id: ID!): SocialLink
     users: [User!]!
     user(id: ID!): User
     me: User!
@@ -180,9 +183,12 @@ export const typeDefs = /* GraphQL */ `
     updateHistorialSection(description: String!): HistorialSection!
 
     createOfficialContact(input: OfficialContactInput!): OfficialContact!
+    updateOfficialContact(id: ID!, input: OfficialContactInput!): OfficialContact!
     deleteOfficialContact(id: ID!): Boolean!
+    moveOfficialContact(id: ID!, direction: MoveDirection!): Boolean!
 
     createSocialLink(input: SocialLinkInput!): SocialLink!
+    updateSocialLink(id: ID!, input: SocialLinkInput!): SocialLink!
     deleteSocialLink(id: ID!): Boolean!
     moveSocialLink(id: ID!, direction: MoveDirection!): Boolean!
 

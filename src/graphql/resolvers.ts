@@ -103,8 +103,12 @@ export const resolvers = {
     historialSection: () =>
       prisma.historialSection.findUnique({ where: { id: HISTORIAL_SECTION_ID } }),
     officialContacts: () =>
-      prisma.officialContact.findMany({ orderBy: { createdAt: "asc" } }),
+      prisma.officialContact.findMany({ orderBy: [{ order: "asc" }, { createdAt: "asc" }] }),
+    officialContact: (_: unknown, args: { id: string }) =>
+      prisma.officialContact.findUnique({ where: { id: args.id } }),
     socialLinks: () => prisma.socialLink.findMany({ orderBy: { order: "asc" } }),
+    socialLink: (_: unknown, args: { id: string }) =>
+      prisma.socialLink.findUnique({ where: { id: args.id } }),
     ...accountQueries,
   },
 
@@ -328,13 +332,25 @@ export const resolvers = {
       });
     },
 
-    createOfficialContact: (
+    createOfficialContact: async (
       _: unknown,
       args: { input: OfficialContactInput },
       context: GraphQLContext,
     ) => {
       requireUserId(context);
-      return prisma.officialContact.create({ data: args.input });
+      // New contacts go to the end of the list.
+      const highest = await prisma.officialContact.aggregate({ _max: { order: true } });
+      return prisma.officialContact.create({
+        data: { ...args.input, order: (highest._max.order ?? -1) + 1 },
+      });
+    },
+    updateOfficialContact: (
+      _: unknown,
+      args: { id: string; input: OfficialContactInput },
+      context: GraphQLContext,
+    ) => {
+      requireUserId(context);
+      return prisma.officialContact.update({ where: { id: args.id }, data: args.input });
     },
     deleteOfficialContact: async (
       _: unknown,
@@ -343,6 +359,28 @@ export const resolvers = {
     ) => {
       requireUserId(context);
       await prisma.officialContact.delete({ where: { id: args.id } });
+      return true;
+    },
+    moveOfficialContact: async (
+      _: unknown,
+      args: { id: string; direction: "UP" | "DOWN" },
+      context: GraphQLContext,
+    ) => {
+      requireUserId(context);
+      const contacts = await prisma.officialContact.findMany({
+        orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+      });
+      const index = contacts.findIndex((contact) => contact.id === args.id);
+      const swapIndex = args.direction === "UP" ? index - 1 : index + 1;
+      if (index === -1 || swapIndex < 0 || swapIndex >= contacts.length) {
+        return false;
+      }
+      const current = contacts[index];
+      const swap = contacts[swapIndex];
+      await prisma.$transaction([
+        prisma.officialContact.update({ where: { id: current.id }, data: { order: swap.order } }),
+        prisma.officialContact.update({ where: { id: swap.id }, data: { order: current.order } }),
+      ]);
       return true;
     },
 
@@ -356,6 +394,15 @@ export const resolvers = {
       return prisma.socialLink.create({
         data: { ...args.input, order: (highest._max.order ?? -1) + 1 },
       });
+    },
+    updateSocialLink: (
+      _: unknown,
+      args: { id: string; input: SocialLinkInput },
+      context: GraphQLContext,
+    ) => {
+      requireUserId(context);
+      // Keeps its place in the order; only the platform and link change.
+      return prisma.socialLink.update({ where: { id: args.id }, data: args.input });
     },
     deleteSocialLink: async (
       _: unknown,

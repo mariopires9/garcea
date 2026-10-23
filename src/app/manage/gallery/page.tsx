@@ -142,7 +142,9 @@ export default async function ManageGalleryPage({
                   <Typography variant="caption" color="text.secondary">
                     {item.event?.title ?? "Sem evento"}
                   </Typography>
-                  <Stack direction="row" spacing={2}>
+                  {/* Negative margin: the text buttons' padding would otherwise
+                      push "Editar" right of the caption above. */}
+                  <Box sx={{ display: "flex", gap: 1, ml: -0.5 }}>
                     <Button href={`/manage/gallery/${item.id}/edit`} size="small">
                       Editar
                     </Button>
@@ -153,7 +155,7 @@ export default async function ManageGalleryPage({
                     >
                       Eliminar
                     </Button>
-                  </Stack>
+                  </Box>
                 </Stack>
               ))}
             </Box>

@@ -22,11 +22,15 @@ const VALUE_FIELD: Record<ContactType, { label: string; type: string; placeholde
 export function OfficialContactForm({
   action,
   error,
+  defaultValues,
+  submitLabel = "Adicionar",
 }: {
   action: (formData: FormData) => void | Promise<void>;
   error?: string;
+  defaultValues?: { type: ContactType; label: string | null; value: string };
+  submitLabel?: string;
 }) {
-  const [type, setType] = useState<ContactType>("EMAIL");
+  const [type, setType] = useState<ContactType>(defaultValues?.type ?? "EMAIL");
   const valueField = VALUE_FIELD[type];
 
   return (
@@ -55,6 +59,7 @@ export function OfficialContactForm({
           label="Etiqueta (opcional)"
           name="label"
           placeholder="Ex.: Associação GARCEA"
+          defaultValue={defaultValues?.label ?? ""}
         />
 
         <TextField
@@ -63,10 +68,11 @@ export function OfficialContactForm({
           type={valueField.type}
           placeholder={valueField.placeholder}
           required
+          defaultValue={defaultValues?.value}
         />
 
         <SubmitButton variant="contained" sx={{ alignSelf: "flex-start" }}>
-          Adicionar
+          {submitLabel}
         </SubmitButton>
       </Stack>
     </FormCard>

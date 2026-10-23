@@ -16,11 +16,15 @@ type Platform = keyof typeof SOCIAL_PLATFORM_LABELS;
 export function SocialLinkForm({
   action,
   error,
+  defaultValues,
+  submitLabel = "Adicionar",
 }: {
   action: (formData: FormData) => void | Promise<void>;
   error?: string;
+  defaultValues?: { platform: Platform; url: string };
+  submitLabel?: string;
 }) {
-  const [platform, setPlatform] = useState<Platform>("FACEBOOK");
+  const [platform, setPlatform] = useState<Platform>(defaultValues?.platform ?? "FACEBOOK");
 
   return (
     <FormCard error={error}>
@@ -50,10 +54,11 @@ export function SocialLinkForm({
           type="url"
           required
           placeholder="https://..."
+          defaultValue={defaultValues?.url}
         />
 
         <SubmitButton variant="contained" sx={{ alignSelf: "flex-start" }}>
-          Adicionar
+          {submitLabel}
         </SubmitButton>
       </Stack>
     </FormCard>

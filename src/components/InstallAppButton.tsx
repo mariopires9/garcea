@@ -7,9 +7,6 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import InstallMobileIcon from "@mui/icons-material/InstallMobile";
 import IosShareIcon from "@mui/icons-material/IosShare";
@@ -53,14 +50,7 @@ const IOS_STEPS = [
  * Chrome and Edge, and shows the "Adicionar ao ecrã principal" steps on
  * iPhone/iPad. Hidden where installing isn't possible or already done.
  */
-export function InstallAppButton({
-  variant = "button",
-  onDone,
-}: {
-  variant?: "button" | "listItem";
-  /** Called after the button is used (e.g. to close the mobile menu). */
-  onDone?: () => void;
-}) {
+export function InstallAppButton() {
   const mode = useSyncExternalStore(subscribeInstallMode, getInstallMode, () => "hidden" as const);
   const [showIosSteps, setShowIosSteps] = useState(false);
 
@@ -72,30 +62,17 @@ export function InstallAppButton({
       return;
     }
     await promptInstall();
-    onDone?.();
   }
 
   return (
     <>
-      {variant === "listItem" ? (
-        <ListItemButton onClick={install}>
-          <ListItemIcon sx={{ minWidth: 36 }}>
-            <InstallMobileIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary="Instalar app" />
-        </ListItemButton>
-      ) : (
-        <Button size="small" variant="outlined" startIcon={<InstallMobileIcon />} onClick={install}>
-          Instalar app
-        </Button>
-      )}
+      <Button size="small" variant="outlined" startIcon={<InstallMobileIcon />} onClick={install}>
+        Instalar app
+      </Button>
 
       <Dialog
         open={showIosSteps}
-        onClose={() => {
-          setShowIosSteps(false);
-          onDone?.();
-        }}
+        onClose={() => setShowIosSteps(false)}
         fullWidth
         maxWidth="xs"
       >
@@ -113,14 +90,7 @@ export function InstallAppButton({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={() => {
-              setShowIosSteps(false);
-              onDone?.();
-            }}
-          >
-            Fechar
-          </Button>
+          <Button onClick={() => setShowIosSteps(false)}>Fechar</Button>
         </DialogActions>
       </Dialog>
     </>

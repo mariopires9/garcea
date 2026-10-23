@@ -5,7 +5,7 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select, { type SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
 
 type EventOption = { id: string; title: string; year: number };
 
@@ -35,7 +35,8 @@ export function GalleryFilters({
     : events;
 
   return (
-    <Stack direction="row" spacing={2} sx={{ flexWrap: "wrap" }}>
+    // gap (not Stack spacing) so a wrapped filter starts at the left edge.
+    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
       <FormControl size="small" sx={{ minWidth: 140 }}>
         <InputLabel id="gallery-year-filter-label" shrink>
           Ano
@@ -80,6 +81,6 @@ export function GalleryFilters({
           ))}
         </Select>
       </FormControl>
-    </Stack>
+    </Box>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useFormStatus } from "react-dom";
 import IconButton from "@mui/material/IconButton";
 import Drawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
@@ -10,33 +9,16 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
 import MenuIcon from "@mui/icons-material/Menu";
-import { InstallAppButton } from "@/components/InstallAppButton";
+import { SignOutButton } from "@/components/SignOutButton";
 
 type NavLink = { href: string; label: string };
-
-function SignOutListItem() {
-  const { pending } = useFormStatus();
-
-  return (
-    <ListItemButton
-      component="button"
-      type="submit"
-      disabled={pending}
-      sx={{ width: "100%", textAlign: "left" }}
-    >
-      <ListItemText primary={pending ? "A sair..." : "Sair"} />
-    </ListItemButton>
-  );
-}
 
 export function NavMobileMenu({
   links,
   isLoggedIn,
-  signOutAction,
 }: {
   links: NavLink[];
   isLoggedIn: boolean;
-  signOutAction: () => void | Promise<void>;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -51,7 +33,8 @@ export function NavMobileMenu({
         <MenuIcon />
       </IconButton>
       <Drawer anchor="right" open={open} onClose={() => setOpen(false)}>
-        <Box sx={{ width: 260 }} role="presentation">
+        {/* Just wide enough for the longest label ("Contactos"). */}
+        <Box sx={{ width: 200 }} role="presentation">
           <List>
             {links.map((link) => (
               <ListItemButton
@@ -70,16 +53,13 @@ export function NavMobileMenu({
                 <ListItemButton href="/manage" onClick={() => setOpen(false)}>
                   <ListItemText primary="Gestão" />
                 </ListItemButton>
-                <Box component="form" action={signOutAction}>
-                  <SignOutListItem />
-                </Box>
+                <SignOutButton display="listItem" />
               </>
             ) : (
               <ListItemButton href="/login" onClick={() => setOpen(false)}>
                 <ListItemText primary="Entrar" />
               </ListItemButton>
             )}
-            <InstallAppButton variant="listItem" onDone={() => setOpen(false)} />
           </List>
         </Box>
       </Drawer>

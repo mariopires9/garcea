@@ -1,6 +1,5 @@
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
 import Stack from "@mui/material/Stack";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
@@ -8,6 +7,7 @@ import ViewAgendaIcon from "@mui/icons-material/ViewAgenda";
 import { executeGraphQL } from "@/lib/graphql-server";
 import { HOME_SECTIONS_QUERY } from "@/lib/queries/homeSections";
 import { PageContainer } from "@/components/PageContainer";
+import { ManageListCard } from "@/components/ManageListCard";
 import { BackButton } from "@/components/BackButton";
 import { PageTitle } from "@/components/PageTitle";
 import { HomeSectionForm } from "@/components/HomeSectionForm";
@@ -55,24 +55,12 @@ export default async function ManageHomeSectionsPage({
             const moveUp = moveHomeSectionAction.bind(null, section.id, "UP");
             const moveDown = moveHomeSectionAction.bind(null, section.id, "DOWN");
             return (
-              <Card
+              <ManageListCard
                 key={section.id}
-                variant="outlined"
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  flexWrap: "wrap",
-                  gap: 2,
-                  p: 2,
-                  transition: "box-shadow 0.2s ease",
-                  "&:hover": { boxShadow: 3 },
-                }}
-              >
-                <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+                leading={
                   <Stack>
                     <form action={moveUp}>
-                      <SubmitIconButton size="small" disabled={index === 0}>
+                      <SubmitIconButton size="small" disabled={index === 0} aria-label="Subir">
                         <ArrowUpwardIcon fontSize="small" />
                       </SubmitIconButton>
                     </form>
@@ -80,43 +68,40 @@ export default async function ManageHomeSectionsPage({
                       <SubmitIconButton
                         size="small"
                         disabled={index === sections.length - 1}
+                        aria-label="Descer"
                       >
                         <ArrowDownwardIcon fontSize="small" />
                       </SubmitIconButton>
                     </form>
                   </Stack>
-                  <Stack>
-                    <Typography sx={{ fontWeight: 500 }}>{section.title}</Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
-                      }}
-                    >
-                      {section.description}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {section.featuredPhotos.length} foto(s) em destaque
-                    </Typography>
-                  </Stack>
-                </Stack>
-                <Stack direction="row" spacing={1}>
-                  <Button href={`/manage/home-sections/${section.id}`} variant="outlined">
-                    Editar
-                  </Button>
-                  <Button
-                    href={`/manage/home-sections/${section.id}/delete`}
-                    color="error"
-                  >
-                    Eliminar
-                  </Button>
-                </Stack>
-              </Card>
+                }
+                actions={
+                  <>
+                    <Button href={`/manage/home-sections/${section.id}`}>Editar</Button>
+                    <Button href={`/manage/home-sections/${section.id}/delete`} color="error">
+                      Eliminar
+                    </Button>
+                  </>
+                }
+              >
+                <Typography sx={{ fontWeight: 500 }}>{section.title}</Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                  }}
+                >
+                  {section.description}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {section.featuredPhotos.length} foto(s) em destaque
+                </Typography>
+              </ManageListCard>
             );
           })}
         </Stack>

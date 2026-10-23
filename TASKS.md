@@ -1107,8 +1107,8 @@ and the sitemap) and was only reachable by typing the address.
       always come from the network, nothing is cached except
       `public/offline.html`, shown when there's no connection. `/sw.js` is
       served with `no-cache` (`next.config.ts` headers).
-- [x] `InstallAppButton` ("Instalar app") in the footer and in the mobile
-      menu:
+- [x] `InstallAppButton` ("Instalar app") in the footer (also in the phone
+      menu until 2026-10-23, removed at Mario's request):
   - Android / desktop Chrome and Edge: opens the browser's install dialog
     (`beforeinstallprompt`, captured early by an inline script in the
     layout - `src/lib/pwa-install.ts`).
@@ -1186,6 +1186,72 @@ paused Vercel functions keep idle connections open, so the slots ran out:
       `height: 1`, which MUI's sx reads as 100%, so they stretched the page
       (blank area below the footer and sideways scroll on phones). Now
       `"1px"`.
+
+## Logout ("Sair") with a full page load
+
+Bug (2026-10-23): on a desktop browser, the top-bar "Sair" showed "This page
+couldn't load". Console: `NotFoundError: Failed to execute 'insertBefore' on
+'Node'`, next to errors from a browser extension's content script. The
+server action signed out and React then updated the header in place
+(Gestão/Sair -> Entrar); an element injected by the extension broke that
+update. Phones (no extensions) and the /manage button were fine.
+
+- [x] `SignOutButton` (client): signs out through Auth.js's
+      `/api/auth/signout` (`signOut` from `next-auth/react`) and then loads
+      `/` from scratch with `window.location`, so React never patches the
+      old page. Used in the top bar, the phone menu and `/manage`; the
+      inline `signOut` server actions in `Nav.tsx` and `/manage` are gone.
+- Verified (dev): all three log out with a full page load and remove the
+  session cookie; with a foreign element inserted into the header first,
+  no errors.
+
+## /manage lists aligned on phones
+
+- [x] `ManageListCard`: shared row for /manage lists - optional `leading`
+      (poster / reorder arrows / icon), details, optional actions. Phones:
+      actions under the details in the same column, lined up with the text;
+      wider screens: actions on the right.
+- [x] Used by events, home sections, official contacts, social links and
+      accounts (accounts' buttons used to jump between the right side and a
+      misaligned second line). Home sections' "Editar" is now a text button
+      like the other lists; the reorder arrows got `aria-label`s.
+- [x] Long social links, contact values and account emails stay on one line
+      with "..." (full value on hover) instead of breaking mid-word.
+- [x] Gallery: the "Evento" filter no longer starts indented when it wraps
+      under "Ano" (flex `gap` instead of Stack `spacing`), and
+      Editar/Eliminar line up with the caption.
+- Verified with phone and desktop screenshots of every list; no sideways
+  scroll.
+
+## Edit social links and official contacts
+
+- [x] GraphQL: `socialLink(id)`, `officialContact(id)`,
+      `updateSocialLink(id, input)` and `updateOfficialContact(id, input)`
+      (login required). A social link keeps its place in the order.
+- [x] `/manage/social-links/[id]/edit` ("Editar Rede Social") and
+      `/manage/official-contacts/[id]/edit` ("Editar Contacto"), reusing
+      `SocialLinkForm` / `OfficialContactForm` with the current values and
+      "Guardar". "Editar" button next to "Eliminar" in both lists.
+- [x] Create and update share one validation per form
+      (`readSocialLinkInput`, `readOfficialContactInput`); errors stay on the
+      edit page, success returns to the list with a message.
+- Verified end to end on temporary items (created, edited - platform/type,
+  label and value - and deleted; none left): prefilled values, saved changes
+  shown in the list, empty value rejected, unknown id -> "Página não
+  encontrada". Real links and contacts untouched.
+
+## Reorder official contacts
+
+- [x] `OfficialContact.order` (migration `20261023180000_add_official_contact_order`,
+      applied 2026-10-23): existing contacts numbered by creation date, so
+      nothing moved. New contacts go to the end.
+- [x] `moveOfficialContact(id, direction)` swaps with the neighbour, like
+      `moveSocialLink`; `officialContacts` sorts by `order`.
+- [x] Up/down arrows on `/manage/official-contacts` (first "up" and last
+      "down" disabled). The public Contacts page groups by type, so the
+      order applies within each group (emails, phones, Facebook).
+- Verified: moved a contact down and back up - list and database back to
+  the original order.
 
 ## Backlog: improvement ideas (free-tier aware)
 

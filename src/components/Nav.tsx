@@ -5,9 +5,9 @@ import MuiLink from "@mui/material/Link";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
-import { auth, signOut } from "@/auth";
+import { auth } from "@/auth";
 import { NavMobileMenu } from "@/components/NavMobileMenu";
-import { SubmitButton } from "@/components/SubmitButton";
+import { SignOutButton } from "@/components/SignOutButton";
 import { ColorModeToggle } from "@/components/ColorModeToggle";
 import { SITE_NAME } from "@/lib/config";
 
@@ -20,11 +20,6 @@ const links = [
 
 export async function Nav() {
   const session = await auth();
-
-  async function signOutAction() {
-    "use server";
-    await signOut({ redirectTo: "/" });
-  }
 
   return (
     <AppBar position="sticky" color="default" elevation={1} sx={{ top: 0 }}>
@@ -69,9 +64,7 @@ export async function Nav() {
               <Button href="/manage" color="inherit">
                 Gestão
               </Button>
-              <form action={signOutAction}>
-                <SubmitButton color="inherit">Sair</SubmitButton>
-              </form>
+              <SignOutButton color="inherit" />
             </>
           ) : (
             <Button href="/login" color="inherit">
@@ -82,11 +75,7 @@ export async function Nav() {
 
         <ColorModeToggle />
 
-        <NavMobileMenu
-          links={links}
-          isLoggedIn={!!session?.user}
-          signOutAction={signOutAction}
-        />
+        <NavMobileMenu links={links} isLoggedIn={!!session?.user} />
       </Toolbar>
     </AppBar>
   );

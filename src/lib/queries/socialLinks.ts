@@ -8,6 +8,24 @@ export const SOCIAL_LINKS_QUERY = /* GraphQL */ `
   }
 `;
 
+export const SOCIAL_LINK_QUERY = /* GraphQL */ `
+  query SocialLink($id: ID!) {
+    socialLink(id: $id) {
+      id
+      platform
+      url
+    }
+  }
+`;
+
+export const UPDATE_SOCIAL_LINK_MUTATION = /* GraphQL */ `
+  mutation UpdateSocialLink($id: ID!, $input: SocialLinkInput!) {
+    updateSocialLink(id: $id, input: $input) {
+      id
+    }
+  }
+`;
+
 export const CREATE_SOCIAL_LINK_MUTATION = /* GraphQL */ `
   mutation CreateSocialLink($input: SocialLinkInput!) {
     createSocialLink(input: $input) {

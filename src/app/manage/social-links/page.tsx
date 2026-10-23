@@ -1,6 +1,5 @@
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
 import Stack from "@mui/material/Stack";
 import ShareIcon from "@mui/icons-material/Share";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
@@ -8,6 +7,7 @@ import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { executeGraphQL } from "@/lib/graphql-server";
 import { SOCIAL_LINKS_QUERY } from "@/lib/queries/socialLinks";
 import { PageContainer } from "@/components/PageContainer";
+import { ManageListCard } from "@/components/ManageListCard";
 import { BackButton } from "@/components/BackButton";
 import { PageTitle } from "@/components/PageTitle";
 import { SocialLinkForm } from "@/components/SocialLinkForm";
@@ -49,52 +49,47 @@ export default async function ManageSocialLinksPage({
             const moveUp = moveSocialLinkAction.bind(null, link.id, "UP");
             const moveDown = moveSocialLinkAction.bind(null, link.id, "DOWN");
             return (
-              <Card
+              <ManageListCard
                 key={link.id}
-                variant="outlined"
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  flexWrap: "wrap",
-                  gap: 2,
-                  p: 2,
-                  transition: "box-shadow 0.2s ease",
-                  "&:hover": { boxShadow: 3 },
-                }}
+                leading={
+                  <>
+                    <Stack>
+                      <form action={moveUp}>
+                        <SubmitIconButton size="small" disabled={index === 0} aria-label="Subir">
+                          <ArrowUpwardIcon fontSize="small" />
+                        </SubmitIconButton>
+                      </form>
+                      <form action={moveDown}>
+                        <SubmitIconButton
+                          size="small"
+                          disabled={index === links.length - 1}
+                          aria-label="Descer"
+                        >
+                          <ArrowDownwardIcon fontSize="small" />
+                        </SubmitIconButton>
+                      </form>
+                    </Stack>
+                    <SocialIcon platform={link.platform} color="primary" />
+                  </>
+                }
+                actions={
+                  <>
+                    <Button href={`/manage/social-links/${link.id}/edit`}>Editar</Button>
+                    <Button href={`/manage/social-links/${link.id}/delete`} color="error">
+                      Eliminar
+                    </Button>
+                  </>
+                }
               >
-                <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
-                  <Stack>
-                    <form action={moveUp}>
-                      <SubmitIconButton size="small" disabled={index === 0}>
-                        <ArrowUpwardIcon fontSize="small" />
-                      </SubmitIconButton>
-                    </form>
-                    <form action={moveDown}>
-                      <SubmitIconButton
-                        size="small"
-                        disabled={index === links.length - 1}
-                      >
-                        <ArrowDownwardIcon fontSize="small" />
-                      </SubmitIconButton>
-                    </form>
-                  </Stack>
-                  <SocialIcon platform={link.platform} color="primary" />
-                  <Stack>
-                    <Typography variant="caption" color="text.secondary">
-                      {SOCIAL_PLATFORM_LABELS[
-                        link.platform as keyof typeof SOCIAL_PLATFORM_LABELS
-                      ] ?? link.platform}
-                    </Typography>
-                    <Typography sx={{ fontWeight: 500, wordBreak: "break-all" }}>
-                      {link.url}
-                    </Typography>
-                  </Stack>
-                </Stack>
-                <Button href={`/manage/social-links/${link.id}/delete`} color="error">
-                  Eliminar
-                </Button>
-              </Card>
+                <Typography variant="caption" color="text.secondary">
+                  {SOCIAL_PLATFORM_LABELS[link.platform as keyof typeof SOCIAL_PLATFORM_LABELS] ??
+                    link.platform}
+                </Typography>
+                {/* Long links are cut with "..."; the full link shows on hover. */}
+                <Typography noWrap title={link.url} sx={{ fontWeight: 500 }}>
+                  {link.url}
+                </Typography>
+              </ManageListCard>
             );
           })}
         </Stack>
