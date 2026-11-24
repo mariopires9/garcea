@@ -118,6 +118,7 @@ enum SocialPlatform {
   TWITTER
   WHATSAPP
   SPOTIFY
+  DEEZER
   OTHER
 }
 
