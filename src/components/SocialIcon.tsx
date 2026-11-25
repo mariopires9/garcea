@@ -9,6 +9,7 @@ import { SpotifyIcon } from "@/components/SpotifyIcon";
 import { DeezerIcon } from "@/components/DeezerIcon";
 import { TikTokIcon } from "@/components/TikTokIcon";
 import { SoundCloudIcon } from "@/components/SoundCloudIcon";
+import { AppleMusicIcon } from "@/components/AppleMusicIcon";
 
 const ICONS = {
   FACEBOOK: FacebookIcon,
@@ -20,6 +21,7 @@ const ICONS = {
   DEEZER: DeezerIcon,
   TIKTOK: TikTokIcon,
   SOUNDCLOUD: SoundCloudIcon,
+  APPLE_MUSIC: AppleMusicIcon,
   OTHER: LanguageIcon,
 } as const;
 
@@ -33,6 +35,7 @@ export const SOCIAL_PLATFORM_LABELS: Record<keyof typeof ICONS, string> = {
   DEEZER: "Deezer",
   TIKTOK: "TikTok",
   SOUNDCLOUD: "SoundCloud",
+  APPLE_MUSIC: "Apple Music",
   OTHER: "Outro",
 };
 

@@ -25,6 +25,7 @@ export const typeDefs = /* GraphQL */ `
     DEEZER
     TIKTOK
     SOUNDCLOUD
+    APPLE_MUSIC
     OTHER
   }
 

@@ -32,7 +32,7 @@ type OfficialContactInput = {
 };
 
 type SocialLinkInput = {
-  platform: "FACEBOOK" | "INSTAGRAM" | "YOUTUBE" | "TWITTER" | "WHATSAPP" | "SPOTIFY" | "DEEZER" | "TIKTOK" | "SOUNDCLOUD" | "OTHER";
+  platform: "FACEBOOK" | "INSTAGRAM" | "YOUTUBE" | "TWITTER" | "WHATSAPP" | "SPOTIFY" | "DEEZER" | "TIKTOK" | "SOUNDCLOUD" | "APPLE_MUSIC" | "OTHER";
   url: string;
 };
 

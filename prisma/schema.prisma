@@ -121,6 +121,7 @@ enum SocialPlatform {
   DEEZER
   TIKTOK
   SOUNDCLOUD
+  APPLE_MUSIC
   OTHER
 }
 
