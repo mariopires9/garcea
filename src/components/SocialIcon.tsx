@@ -8,6 +8,7 @@ import type { SvgIconProps } from "@mui/material/SvgIcon";
 import { SpotifyIcon } from "@/components/SpotifyIcon";
 import { DeezerIcon } from "@/components/DeezerIcon";
 import { TikTokIcon } from "@/components/TikTokIcon";
+import { SoundCloudIcon } from "@/components/SoundCloudIcon";
 
 const ICONS = {
   FACEBOOK: FacebookIcon,
@@ -18,6 +19,7 @@ const ICONS = {
   SPOTIFY: SpotifyIcon,
   DEEZER: DeezerIcon,
   TIKTOK: TikTokIcon,
+  SOUNDCLOUD: SoundCloudIcon,
   OTHER: LanguageIcon,
 } as const;
 
@@ -30,6 +32,7 @@ export const SOCIAL_PLATFORM_LABELS: Record<keyof typeof ICONS, string> = {
   SPOTIFY: "Spotify",
   DEEZER: "Deezer",
   TIKTOK: "TikTok",
+  SOUNDCLOUD: "SoundCloud",
   OTHER: "Outro",
 };
 

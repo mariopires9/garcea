@@ -120,6 +120,7 @@ enum SocialPlatform {
   SPOTIFY
   DEEZER
   TIKTOK
+  SOUNDCLOUD
   OTHER
 }
 

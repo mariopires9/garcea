@@ -24,6 +24,7 @@ const VALID_PLATFORMS = [
   "SPOTIFY",
   "DEEZER",
   "TIKTOK",
+  "SOUNDCLOUD",
   "OTHER",
 ];
 
