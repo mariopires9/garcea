@@ -23,6 +23,7 @@ export const typeDefs = /* GraphQL */ `
     WHATSAPP
     SPOTIFY
     DEEZER
+    TIKTOK
     OTHER
   }
 

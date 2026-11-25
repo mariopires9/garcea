@@ -23,6 +23,7 @@ const VALID_PLATFORMS = [
   "WHATSAPP",
   "SPOTIFY",
   "DEEZER",
+  "TIKTOK",
   "OTHER",
 ];
 

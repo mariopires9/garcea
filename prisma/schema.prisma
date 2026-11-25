@@ -119,6 +119,7 @@ enum SocialPlatform {
   WHATSAPP
   SPOTIFY
   DEEZER
+  TIKTOK
   OTHER
 }
 

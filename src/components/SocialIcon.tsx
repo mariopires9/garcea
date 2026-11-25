@@ -7,6 +7,7 @@ import LanguageIcon from "@mui/icons-material/Language";
 import type { SvgIconProps } from "@mui/material/SvgIcon";
 import { SpotifyIcon } from "@/components/SpotifyIcon";
 import { DeezerIcon } from "@/components/DeezerIcon";
+import { TikTokIcon } from "@/components/TikTokIcon";
 
 const ICONS = {
   FACEBOOK: FacebookIcon,
@@ -16,6 +17,7 @@ const ICONS = {
   WHATSAPP: WhatsAppIcon,
   SPOTIFY: SpotifyIcon,
   DEEZER: DeezerIcon,
+  TIKTOK: TikTokIcon,
   OTHER: LanguageIcon,
 } as const;
 
@@ -27,6 +29,7 @@ export const SOCIAL_PLATFORM_LABELS: Record<keyof typeof ICONS, string> = {
   WHATSAPP: "WhatsApp",
   SPOTIFY: "Spotify",
   DEEZER: "Deezer",
+  TIKTOK: "TikTok",
   OTHER: "Outro",
 };
 
